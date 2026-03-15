@@ -36,8 +36,13 @@ os.makedirs(STAFF_UPLOADS,   exist_ok=True)
 os.makedirs(GALLERY_UPLOADS, exist_ok=True)
 
 # ── CLOUDINARY SETUP ───────────────────────
+# _CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
+# USE_CLOUDINARY  = bool(_CLOUDINARY_URL)
+# if USE_CLOUDINARY:
+#     import cloudinary, cloudinary.uploader
+#     cloudinary.config(cloudinary_url=_CLOUDINARY_URL)
 _CLOUDINARY_URL = os.environ.get('CLOUDINARY_URL', '')
-USE_CLOUDINARY  = bool(_CLOUDINARY_URL)
+USE_CLOUDINARY  = bool(_CLOUDINARY_URL) and _CLOUDINARY_URL.startswith('cloudinary://')
 if USE_CLOUDINARY:
     import cloudinary, cloudinary.uploader
     cloudinary.config(cloudinary_url=_CLOUDINARY_URL)
