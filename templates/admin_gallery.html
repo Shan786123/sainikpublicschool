@@ -1,0 +1,192 @@
+{% extends "admin_base.html" %}
+{% block title %}Gallery{% endblock %}
+{% block page_title %}Photo Gallery Management{% endblock %}
+
+{% block extra_css %}
+<style>
+.gallery-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;margin-top:20px;}
+.gallery-admin-card{background:#fff;border-radius:12px;overflow:hidden;box-shadow:var(--shadow);transition:transform .2s;}
+.gallery-admin-card:hover{transform:translateY(-3px);}
+.gallery-img-wrap{width:100%;height:160px;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;}
+.gallery-img-wrap img{width:100%;height:100%;object-fit:cover;}
+.gallery-img-placeholder{font-size:3rem;opacity:.3;color:#fff;}
+.gallery-card-body{padding:12px;}
+.gallery-card-body h4{font-size:.88rem;font-weight:700;color:var(--navy);margin:0 0 4px;}
+.gallery-card-body .cat{font-size:.72rem;color:var(--text-light);margin-bottom:10px;}
+.gallery-card-actions{display:flex;gap:6px;}
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="table-card">
+  <div class="table-card-header">
+    <h3><i class="fas fa-images" style="margin-right:7px"></i>Gallery Photos ({{ gallery|length }})</h3>
+    <button class="add-btn" onclick="openModal('addGallery')"><i class="fas fa-plus"></i>Add Photo</button>
+  </div>
+
+  {% if gallery %}
+  <div class="gallery-admin-grid">
+    {% for g in gallery %}
+    <div class="gallery-admin-card">
+      <div class="gallery-img-wrap">
+        {% if g.image %}
+          <img src="{{ g.image | imgurl("gallery") }}"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+               alt="{{ g.title }}">
+          <div class="gallery-img-placeholder" style="display:none;"><i class="fas fa-image"></i></div>
+        {% else %}
+          <div class="gallery-img-placeholder"><i class="fas fa-image"></i></div>
+        {% endif %}
+      </div>
+      <div class="gallery-card-body">
+        <h4>{{ g.title }}</h4>
+        <div class="cat"><i class="fas fa-tag" style="margin-right:4px;"></i>{{ g.category }}</div>
+        {% if g.description %}<p style="font-size:.75rem;color:var(--text-light);margin:0 0 8px;">{{ g.description[:60] }}{% if g.description|length > 60 %}…{% endif %}</p>{% endif %}
+        <div class="gallery-card-actions">
+          <button class="btn-view" style="flex:1;"
+            onclick="openEditGallery({{ g.id }},'{{ g.title }}','{{ g.description or '' }}','{{ g.category }}','{{ g.image or '' }}')">
+            <i class="fas fa-edit"></i> Edit
+          </button>
+          <a href="/admin/gallery/delete/{{ g.id }}"
+             class="btn-del"
+             onclick="return confirm('Delete {{ g.title }}?')">
+            <i class="fas fa-trash"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:60px 20px;color:var(--text-light);">
+    <i class="fas fa-images" style="font-size:3rem;opacity:.2;display:block;margin-bottom:14px;"></i>
+    No gallery photos yet. Click <strong>Add Photo</strong> to get started.
+  </div>
+  {% endif %}
+</div>
+
+<!-- ─── ADD GALLERY MODAL ─── -->
+<div class="modal-overlay" id="addGallery">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addGallery')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-image" style="color:var(--gold);margin-right:8px"></i>Add Gallery Photo</h3>
+    <form action="/admin/gallery/add" method="POST" enctype="multipart/form-data">
+
+      <!-- PHOTO UPLOAD -->
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="width:100%;height:160px;border-radius:10px;border:3px dashed var(--gold);overflow:hidden;background:#f8f8f8;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+          <img id="add_gal_preview" src="" alt="Preview"
+               style="display:none;width:100%;height:100%;object-fit:cover;">
+          <div id="add_gal_placeholder" style="text-align:center;color:#aaa;">
+            <i class="fas fa-cloud-upload-alt" style="font-size:2.5rem;display:block;margin-bottom:6px;"></i>
+            <span style="font-size:.8rem;">Click below to choose a photo</span>
+          </div>
+        </div>
+        <input type="file" id="add_gal_photo" name="photo" accept="image/*"
+               onchange="previewGallery('add_gal_photo','add_gal_preview','add_gal_placeholder')"
+               style="display:none;">
+        <label for="add_gal_photo" style="display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:var(--gold);padding:8px 20px;border-radius:50px;cursor:pointer;font-size:.82rem;font-weight:700;">
+          <i class="fas fa-camera"></i>Choose Photo
+        </label>
+        <span style="margin-left:8px;font-size:.75rem;color:var(--text-light);">JPG/PNG/WEBP · max 5MB</span>
+      </div>
+
+      <div class="fg"><label>Title *</label><input name="title" type="text" placeholder="e.g. Annual Sports Day 2025" required></div>
+      <div class="fg"><label>Description</label><input name="description" type="text" placeholder="Short description (optional)"></div>
+      <div class="fg"><label>Category</label>
+        <select name="category">
+          <option>General</option><option>Sports</option><option>Academic</option>
+          <option>Cultural</option><option>Science</option><option>Annual Day</option>
+          <option>Republic Day</option><option>Independence Day</option><option>Field Trip</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn"><i class="fas fa-save" style="margin-right:7px"></i>Add to Gallery</button>
+    </form>
+  </div>
+</div>
+
+<!-- ─── EDIT GALLERY MODAL ─── -->
+<div class="modal-overlay" id="editGallery">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('editGallery')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-edit" style="color:var(--gold);margin-right:8px"></i>Edit Gallery Item</h3>
+    <form id="editGalleryForm" action="" method="POST" enctype="multipart/form-data">
+
+      <!-- CURRENT + CHANGE PHOTO -->
+      <div style="margin-bottom:18px;">
+        <div style="width:100%;height:160px;border-radius:10px;border:3px solid var(--gold);overflow:hidden;background:#eee;display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+          <img id="edit_gal_preview" src="" alt="Current"
+               style="width:100%;height:100%;object-fit:cover;"
+               onerror="this.style.display='none';document.getElementById('edit_gal_placeholder').style.display='flex';">
+          <div id="edit_gal_placeholder" style="display:none;text-align:center;color:#aaa;width:100%;">
+            <i class="fas fa-image" style="font-size:2rem;"></i>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <input type="file" id="edit_gal_photo" name="photo" accept="image/*"
+                 onchange="previewGallery('edit_gal_photo','edit_gal_preview','edit_gal_placeholder')"
+                 style="display:none;">
+          <label for="edit_gal_photo" style="display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:var(--gold);padding:8px 20px;border-radius:50px;cursor:pointer;font-size:.82rem;font-weight:700;">
+            <i class="fas fa-camera"></i>Change Photo
+          </label>
+          <span style="margin-left:8px;font-size:.75rem;color:var(--text-light);">Leave unchanged to keep current</span>
+        </div>
+      </div>
+
+      <div class="fg"><label>Title *</label><input name="title" id="edit_gal_title" type="text" required></div>
+      <div class="fg"><label>Description</label><input name="description" id="edit_gal_desc" type="text"></div>
+      <div class="fg"><label>Category</label>
+        <select name="category" id="edit_gal_cat">
+          <option>General</option><option>Sports</option><option>Academic</option>
+          <option>Cultural</option><option>Science</option><option>Annual Day</option>
+          <option>Republic Day</option><option>Independence Day</option><option>Field Trip</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn" style="background:var(--gold);color:var(--navy);">
+        <i class="fas fa-save" style="margin-right:7px"></i>Save Changes
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function previewGallery(inputId, previewId, placeholderId) {
+  const input = document.getElementById(inputId);
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById(previewId);
+    const ph  = document.getElementById(placeholderId);
+    img.src = e.target.result;
+    img.style.display = 'block';
+    if (ph) ph.style.display = 'none';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function openEditGallery(id, title, desc, cat, image) {
+  document.getElementById('editGalleryForm').action = '/admin/gallery/edit/' + id;
+  document.getElementById('edit_gal_title').value = title;
+  document.getElementById('edit_gal_desc').value  = desc;
+  const preview = document.getElementById('edit_gal_preview');
+  const ph      = document.getElementById('edit_gal_placeholder');
+  if (image) {
+    preview.src          = '/static/uploads/gallery/' + image;
+    preview.style.display = 'block';
+    ph.style.display      = 'none';
+  } else {
+    preview.style.display = 'none';
+    ph.style.display      = 'flex';
+  }
+  const catSel = document.getElementById('edit_gal_cat');
+  for (let i = 0; i < catSel.options.length; i++) {
+    if (catSel.options[i].value === cat || catSel.options[i].text === cat) {
+      catSel.selectedIndex = i; break;
+    }
+  }
+  openModal('editGallery');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "admin_base.html" %}
+{% block title %}Results{% endblock %}
+{% block page_title %}Result Management{% endblock %}
+{% block admin_content %}
+<div class="table-card">
+  <div class="table-card-header">
+    <h3><i class="fas fa-chart-bar" style="margin-right:7px"></i>All Results ({{ results|length }})</h3>
+    <button class="add-btn" onclick="openModal('addResult')"><i class="fas fa-plus"></i>Add Result</button>
+  </div>
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead><tr><th>#</th><th>Roll No</th><th>Student</th><th>Class</th><th>Exam</th><th>Session</th><th>Subject</th><th>Marks</th><th>Grade</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for r in results %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ r.roll_no }}</strong></td>
+        <td>{{ r.student_name }}</td>
+        <td>{{ r.class_name }}</td>
+        <td><span class="badge badge-blue">{{ r.exam_type }}</span></td>
+        <td>{{ r.session }}</td>
+        <td>{{ r.subject }}</td>
+        <td><strong>{{ r.obtained_marks }}</strong>/{{ r.max_marks }}</td>
+        <td><span class="badge badge-{% if r.grade in ['A+','A'] %}green{% elif r.grade in ['B+','B'] %}blue{% elif r.grade=='C' %}yellow{% else %}red{% endif %}">{{ r.grade }}</span></td>
+        <td><a href="/admin/results/delete/{{ r.id }}" class="btn-del" onclick="return confirm('Delete this result?')"><i class="fas fa-trash"></i></a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="10" style="text-align:center;color:var(--text-light);padding:30px;">No results found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addResult">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addResult')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-chart-bar" style="color:var(--gold);margin-right:8px"></i>Add Result</h3>
+    <form action="/admin/results/add" method="POST">
+      <div class="form-row2">
+        <div class="fg">
+          <label>Select Student *</label>
+          <select name="roll_no" id="studentSelect" onchange="fillStudent(this)" required>
+            <option value="">-- Select Student --</option>
+            {% for s in students %}
+            <option value="{{ s.roll_no }}" data-name="{{ s.name }}" data-class="{{ s.class_name }}">{{ s.roll_no }} – {{ s.name }} ({{ s.class_name }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="fg"><label>Student Name *</label><input name="student_name" id="studentName" type="text" placeholder="Auto-filled" required readonly style="background:#f0f0f0;"></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Class *</label><input name="class_name" id="studentClass" type="text" placeholder="Auto-filled" required readonly style="background:#f0f0f0;"></div>
+        <div class="fg"><label>Subject *</label>
+          <select name="subject">
+            <option>Mathematics</option><option>Physics</option><option>Chemistry</option>
+            <option>Biology</option><option>English</option><option>Hindi</option>
+            <option>Sanskrit</option><option>History</option><option>Geography</option>
+            <option>Social Science</option><option>Science</option><option>Computer</option>
+            <option>Economics</option><option>Accountancy</option><option>Business Studies</option>
+            <option>EVS</option><option>Art</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Exam Type *</label>
+          <select name="exam_type"><option>Half-Yearly</option><option>Annual</option><option>Pre-Board</option><option>Unit Test</option><option>Quarterly</option></select>
+        </div>
+        <div class="fg"><label>Session *</label>
+          <select name="session"><option>2024-25</option><option>2023-24</option><option>2022-23</option></select>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Max Marks</label><input name="max_marks" type="number" value="100" min="1" max="200"></div>
+        <div class="fg"><label>Marks Obtained *</label><input name="obtained_marks" type="number" placeholder="e.g. 85" min="0" max="200" required></div>
+      </div>
+      <button type="submit" class="submit-btn"><i class="fas fa-save" style="margin-right:7px"></i>Save Result</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+function fillStudent(sel){
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('studentName').value=opt.dataset.name||'';
+  document.getElementById('studentClass').value=opt.dataset.class||'';
+}
+</script>
+{% endblock %}

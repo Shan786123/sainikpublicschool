@@ -1,0 +1,226 @@
+{% extends "admin_base.html" %}
+{% block title %}Staff{% endblock %}
+{% block page_title %}Staff Management{% endblock %}
+
+{% block extra_css %}
+<style>
+.staff-avatar-sm{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#eee;}
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="table-card">
+  <div class="table-card-header">
+    <h3><i class="fas fa-chalkboard-teacher" style="margin-right:7px"></i>All Staff Members ({{ staff|length }})</h3>
+    <button class="add-btn" onclick="openModal('addStaff')"><i class="fas fa-plus"></i>Add Staff</button>
+  </div>
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Photo</th><th>Emp ID</th><th>Name</th><th>Designation</th>
+        <th>Subject</th><th>Phone</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in staff %}
+      <tr>
+        <td>
+          {% if s.profile_image and s.profile_image != 'default.png' %}
+            <img src="{{ s.profile_image | imgurl("staff") }}" class="staff-avatar-sm"
+                 onerror="this.src='/static/images/default_staff.svg'">
+          {% else %}
+            <img src="/static/images/default_staff.svg" class="staff-avatar-sm">
+          {% endif %}
+        </td>
+        <td><strong>{{ s.emp_id }}</strong></td>
+        <td>{{ s.name }}</td>
+        <td><span class="badge badge-blue">{{ s.designation }}</span></td>
+        <td>{{ s.subject or '–' }}</td>
+        <td>{{ s.phone or '–' }}</td>
+        <td><span class="badge badge-{% if s.status=='active' %}green{% else %}red{% endif %}">{{ s.status|title }}</span></td>
+        <td>
+          <div style="display:flex;gap:5px;">
+            <button class="btn-view"
+              onclick="openEditStaff(
+                {{ s.id }},
+                '{{ s.emp_id }}',
+                '{{ s.name }}',
+                '{{ s.designation or "" }}',
+                '{{ s.subject or "" }}',
+                '{{ s.qualification or "" }}',
+                '{{ s.phone or "" }}',
+                '{{ s.email or "" }}',
+                '{{ s.joining_date or "" }}',
+                '{{ s.status }}',
+                '{{ s.profile_image or "default.png" }}'
+              )">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <a href="/admin/staff/delete/{{ s.id }}"
+               class="btn-del"
+               onclick="return confirm('Remove {{ s.name }}?')">
+              <i class="fas fa-trash"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" style="text-align:center;color:var(--text-light);padding:30px;">No staff found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ─── ADD STAFF MODAL ─── -->
+<div class="modal-overlay" id="addStaff">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addStaff')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-chalkboard-teacher" style="color:var(--gold);margin-right:8px"></i>Add Staff Member</h3>
+    <form action="/admin/staff/add" method="POST" enctype="multipart/form-data">
+
+      <!-- PHOTO UPLOAD -->
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="width:90px;height:90px;border-radius:50%;border:3px dashed var(--gold);margin:0 auto 10px;overflow:hidden;background:#f8f8f8;">
+          <img id="add_staff_preview" src="/static/images/default_staff.svg"
+               style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <input type="file" id="add_staff_photo" name="photo" accept="image/*"
+               onchange="previewPhoto('add_staff_photo','add_staff_preview')" style="display:none;">
+        <label for="add_staff_photo" style="display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:var(--gold);padding:7px 16px;border-radius:50px;cursor:pointer;font-size:.78rem;font-weight:700;">
+          <i class="fas fa-camera"></i>Upload Photo
+        </label>
+        <div style="font-size:.72rem;color:var(--text-light);margin-top:5px;">JPG / PNG / WEBP · max 5 MB</div>
+      </div>
+
+      <div class="form-row2">
+        <div class="fg"><label>Employee ID *</label><input name="emp_id" type="text" placeholder="e.g. EMP010" required></div>
+        <div class="fg"><label>Full Name *</label><input name="name" type="text" placeholder="Full Name" required></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Designation *</label>
+          <select name="designation">
+            <option>Manager</option><option>Principal</option><option>Vice Principal</option><option>Senior Teacher</option>
+            <option>Teacher</option><option>Primary Teacher</option><option>Lab Assistant</option>
+            <option>Librarian</option><option>PTI</option><option>Office Staff</option>
+          </select>
+        </div>
+        <div class="fg"><label>Subject</label><input name="subject" type="text" placeholder="e.g. Mathematics"></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Qualification</label><input name="qualification" type="text" placeholder="e.g. M.Sc., B.Ed."></div>
+        <div class="fg"><label>Joining Date</label><input name="joining_date" type="date"></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Phone</label><input name="phone" type="tel"></div>
+        <div class="fg"><label>Email</label><input name="email" type="email"></div>
+      </div>
+      <button type="submit" class="submit-btn"><i class="fas fa-save" style="margin-right:7px"></i>Add Staff Member</button>
+    </form>
+  </div>
+</div>
+
+<!-- ─── EDIT STAFF MODAL ─── -->
+<div class="modal-overlay" id="editStaff">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('editStaff')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-user-edit" style="color:var(--gold);margin-right:8px"></i>Edit Staff Details</h3>
+    <form id="editStaffForm" action="" method="POST" enctype="multipart/form-data">
+
+      <!-- CURRENT PHOTO + CHANGE -->
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="width:90px;height:90px;border-radius:50%;border:3px solid var(--gold);margin:0 auto 10px;overflow:hidden;background:#eee;">
+          <img id="edit_staff_preview" src="/static/images/default_staff.svg"
+               style="width:100%;height:100%;object-fit:cover;"
+               onerror="this.src='/static/images/default_staff.svg'">
+        </div>
+        <input type="file" id="edit_staff_photo" name="photo" accept="image/*"
+               onchange="previewPhoto('edit_staff_photo','edit_staff_preview')" style="display:none;">
+        <label for="edit_staff_photo" style="display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:var(--gold);padding:7px 16px;border-radius:50px;cursor:pointer;font-size:.78rem;font-weight:700;">
+          <i class="fas fa-camera"></i>Change Photo
+        </label>
+        <div style="font-size:.72rem;color:var(--text-light);margin-top:5px;">Leave unchanged to keep current photo</div>
+      </div>
+
+      <div class="form-row2">
+        <div class="fg">
+          <label>Employee ID</label>
+          <input id="edit_emp_id" type="text" style="background:#f0f0f0;opacity:.7;" readonly>
+        </div>
+        <div class="fg"><label>Full Name *</label><input name="name" id="edit_s_name" type="text" required></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Designation</label>
+          <select name="designation" id="edit_designation">
+            <option>Principal</option><option>Vice Principal</option><option>Senior Teacher</option>
+            <option>Teacher</option><option>Primary Teacher</option><option>Lab Assistant</option>
+            <option>Librarian</option><option>PTI</option><option>Office Staff</option>
+          </select>
+        </div>
+        <div class="fg"><label>Subject</label><input name="subject" id="edit_subject" type="text"></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Qualification</label><input name="qualification" id="edit_qualification" type="text"></div>
+        <div class="fg"><label>Joining Date</label><input name="joining_date" id="edit_joining_date" type="date"></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Phone</label><input name="phone" id="edit_s_phone" type="tel"></div>
+        <div class="fg"><label>Email</label><input name="email" id="edit_s_email" type="email"></div>
+      </div>
+      <div class="fg"><label>Status</label>
+        <select name="status" id="edit_s_status">
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <button type="submit" class="submit-btn" style="background:var(--gold);color:var(--navy);">
+        <i class="fas fa-save" style="margin-right:7px"></i>Save Changes
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function previewPhoto(inputId, previewId) {
+  const input = document.getElementById(inputId);
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => { document.getElementById(previewId).src = e.target.result; };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function openEditStaff(id, emp_id, name, designation, subject, qualification,
+                       phone, email, joining_date, status, photo) {
+  document.getElementById('editStaffForm').action = '/admin/staff/edit/' + id;
+  document.getElementById('edit_emp_id').value        = emp_id;
+  document.getElementById('edit_s_name').value        = name;
+  document.getElementById('edit_subject').value       = subject;
+  document.getElementById('edit_qualification').value = qualification;
+  document.getElementById('edit_joining_date').value  = joining_date;
+  document.getElementById('edit_s_phone').value       = phone;
+  document.getElementById('edit_s_email').value       = email;
+  // Set current photo
+  const preview = document.getElementById('edit_staff_preview');
+  if (photo && photo !== 'default.png') {
+    preview.src = photo.startsWith('http') ? photo : '/static/uploads/staff/' + photo;
+  } else {
+    preview.src = '/static/images/default_staff.svg';
+  }
+  setSelectVal('edit_designation', designation);
+  setSelectVal('edit_s_status',    status);
+  openModal('editStaff');
+}
+function setSelectVal(id, val) {
+  const sel = document.getElementById(id);
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === val || sel.options[i].text === val) {
+      sel.selectedIndex = i; break;
+    }
+  }
+}
+</script>
+{% endblock %}

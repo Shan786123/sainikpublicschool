@@ -1,0 +1,418 @@
+{% extends "admin_base.html" %}
+{% block title %}Marks{% endblock %}
+{% block page_title %}Marks Management{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── FILTER BAR ── */
+.filter-bar{background:#fff;border-radius:12px;padding:16px 20px;box-shadow:var(--shadow);margin-bottom:22px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;}
+.filter-bar .fg{flex:1;min-width:130px;}
+.filter-bar .fg label{font-size:.72rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:4px;}
+.filter-bar select,.filter-bar input[type=text]{width:100%;padding:8px 11px;border:1.5px solid #dde2ef;border-radius:7px;font-family:'Mulish',sans-serif;font-size:.85rem;color:var(--text);background:#f8f9ff;outline:none;}
+.filter-bar select:focus,.filter-bar input:focus{border-color:var(--navy);}
+.filter-btn{background:var(--navy);color:var(--gold);border:none;padding:9px 20px;border-radius:7px;font-weight:700;font-size:.83rem;cursor:pointer;white-space:nowrap;align-self:flex-end;}
+.filter-btn:hover{background:var(--navy-light);}
+.clear-btn{background:#f1f3f8;color:var(--text);border:none;padding:9px 16px;border-radius:7px;font-weight:700;font-size:.83rem;cursor:pointer;align-self:flex-end;}
+
+/* ── MARKS TABLE FILTER ── */
+.marks-filter{display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:14px 18px;background:#f8f9ff;border-bottom:1px solid #eee;}
+.marks-filter select,.marks-filter input{padding:7px 11px;border:1.5px solid #dde2ef;border-radius:7px;font-family:'Mulish',sans-serif;font-size:.82rem;outline:none;background:#fff;}
+.marks-filter select:focus,.marks-filter input:focus{border-color:var(--navy);}
+.mf-label{font-size:.75rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;align-self:center;}
+
+/* ── WIDE MODAL OVERRIDE ── */
+#addMarkModal .modal{width:900px;max-width:96vw;padding:28px 32px;}
+
+/* ── STUDENT HEADER CARD ── */
+.stu-info-bar{background:linear-gradient(135deg,var(--navy) 0%,#1a3a6c 100%);border-radius:10px;padding:14px 20px;margin-bottom:18px;display:flex;gap:24px;flex-wrap:wrap;align-items:center;}
+.stu-info-bar .sib-item{display:flex;flex-direction:column;}
+.sib-lbl{font-size:.65rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;}
+.sib-val{font-weight:700;font-size:.95rem;color:#fff;}
+.sib-val.gold{color:var(--gold);}
+
+/* ── EXAM SETTINGS ── */
+.exam-settings{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
+.exam-settings .fg label{font-size:.72rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:4px;}
+.exam-settings .fg select,
+.exam-settings .fg input{width:100%;padding:8px 10px;border:1.5px solid #dde2ef;border-radius:7px;font-size:.83rem;font-family:'Mulish',sans-serif;outline:none;background:#f8f9ff;}
+.exam-settings .fg select:focus,
+.exam-settings .fg input:focus{border-color:var(--navy);}
+
+/* ── PUBLISH ROW ── */
+.pub-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px;padding:12px 16px;background:#f8f9ff;border-radius:8px;border:1.5px solid #e8ecf7;}
+.pub-row .fg label{font-size:.72rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:4px;}
+.pub-row .fg input[type=date]{width:100%;padding:8px 10px;border:1.5px solid #dde2ef;border-radius:7px;font-size:.83rem;font-family:'Mulish',sans-serif;outline:none;background:#fff;}
+.pub-toggle{display:flex;align-items:center;gap:10px;padding-top:20px;}
+.pub-toggle input[type=checkbox]{width:18px;height:18px;accent-color:var(--navy);cursor:pointer;flex-shrink:0;}
+.pub-toggle label{cursor:pointer;font-size:.85rem;line-height:1.3;}
+
+/* ── SUBJECTS SECTION ── */
+.subj-section-title{font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:8px;padding-bottom:8px;border-bottom:1.5px solid #eee;display:flex;align-items:center;gap:7px;}
+.subj-col-heads{display:grid;grid-template-columns:2.2fr 1fr 90px 90px 80px 36px;gap:8px;padding:0 10px;margin-bottom:4px;}
+.subj-col-heads span{font-size:.7rem;font-weight:700;color:var(--text-light);text-transform:uppercase;letter-spacing:.4px;}
+.subject-row{display:grid;grid-template-columns:2.2fr 1fr 90px 90px 80px 36px;gap:8px;align-items:center;margin-bottom:6px;background:#fff;border-radius:8px;padding:8px 10px;border:1.5px solid #e8ecf7;}
+.subject-row:hover{border-color:var(--navy);}
+.subject-row select,.subject-row input{padding:7px 9px;border:1px solid #dde2ef;border-radius:6px;font-size:.82rem;font-family:'Mulish',sans-serif;width:100%;outline:none;background:#fafbff;}
+.subject-row select:focus,.subject-row input:focus{border-color:var(--navy);background:#fff;}
+.remove-row-btn{background:#fee2e2;color:#dc2626;border:none;border-radius:6px;width:32px;height:32px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.remove-row-btn:hover{background:#fca5a5;}
+.add-subject-btn{display:flex;align-items:center;justify-content:center;gap:7px;background:transparent;border:2px dashed #c5cde8;color:var(--navy);padding:10px;border-radius:8px;cursor:pointer;font-weight:700;font-size:.82rem;margin-top:6px;transition:all .2s;width:100%;}
+.add-subject-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ── MARKS TABLE ── */
+.marks-table-wrap{overflow-x:auto;}
+</style>
+{% endblock %}
+
+{% block admin_content %}
+
+<!-- INFO BANNER -->
+<div style="background:var(--cream);border-radius:10px;padding:12px 16px;margin-bottom:20px;border-left:3px solid var(--gold);font-size:.85rem;">
+  <i class="fas fa-info-circle" style="color:var(--gold);margin-right:6px;"></i>
+  <strong>How to add marks:</strong> Filter by Class & Section below → click <strong style="color:var(--navy);">Add Marks</strong> next to a student → enter all subjects at once.
+</div>
+
+<!-- ── STEP 1: FILTER STUDENTS ── -->
+<div class="filter-bar">
+  <div class="fg">
+    <label><i class="fas fa-chalkboard" style="margin-right:3px;"></i>Class</label>
+    <select id="filterClass" onchange="filterStudents()">
+      <option value="">All Classes</option>
+      {% for cl in classes %}
+      <option value="{{ cl.class_name }}">{{ cl.class_name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="fg" style="max-width:120px;">
+    <label>Section</label>
+    <select id="filterSection" onchange="filterStudents()">
+      <option value="">All</option>
+      {% for sec in sections %}
+      <option value="{{ sec.section }}">{{ sec.section }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="fg">
+    <label><i class="fas fa-search" style="margin-right:3px;"></i>Search Name / Roll</label>
+    <input type="text" id="searchStudent" oninput="filterStudents()" placeholder="e.g. Rahul or STU001">
+  </div>
+  <button class="clear-btn" onclick="clearFilters()"><i class="fas fa-times" style="margin-right:5px;"></i>Clear</button>
+</div>
+
+<!-- STUDENT LIST -->
+<div class="table-card" style="margin-bottom:28px;">
+  <div class="table-card-header">
+    <h3><i class="fas fa-users" style="margin-right:7px;"></i>Students
+      <span id="studentCount" style="font-size:.78rem;color:var(--text-light);font-weight:400;margin-left:8px;"></span>
+    </h3>
+  </div>
+  <div style="overflow-x:auto;">
+  <table class="data-table" id="studentTable">
+    <thead>
+      <tr><th>Roll No</th><th>Enrollment</th><th>Name</th><th>Class</th><th>Section</th><th style="width:130px;">Action</th></tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr data-class="{{ s.class_name }}" data-section="{{ s.section }}"
+          data-name="{{ s.name|lower }}" data-roll="{{ s.roll_no|lower }}">
+        <td><strong>{{ s.roll_no }}</strong></td>
+        <td><small style="color:var(--text-light);">{{ s.enrollment_no or '—' }}</small></td>
+        <td>{{ s.name }}</td>
+        <td>{{ s.class_name }}</td>
+        <td>{{ s.section }}</td>
+        <td>
+          <button class="btn-view"
+            onclick="openAddMarks('{{ s.roll_no }}','{{ s.name }}','{{ s.class_name }}','{{ s.section }}')">
+            <i class="fas fa-plus"></i> Add Marks
+          </button>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text-light);">No students found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ── SAVED MARKS TABLE ── -->
+<div class="table-card">
+  <div class="table-card-header">
+    <h3><i class="fas fa-chart-bar" style="margin-right:7px;"></i>Saved Marks
+      <span id="marksCount" style="font-size:.78rem;color:var(--text-light);font-weight:400;margin-left:8px;"></span>
+    </h3>
+  </div>
+
+  <!-- MARKS FILTER BAR -->
+  <div class="marks-filter">
+    <span class="mf-label"><i class="fas fa-filter" style="margin-right:4px;"></i>Filter:</span>
+    <select id="mfClass" onchange="filterMarks()">
+      <option value="">All Classes</option>
+      {% for cl in classes %}
+      <option value="{{ cl.class_name }}">{{ cl.class_name }}</option>
+      {% endfor %}
+    </select>
+    <select id="mfExam" onchange="filterMarks()">
+      <option value="">All Exam Types</option>
+      <option>Annual</option><option>Half-Yearly</option>
+      <option>Unit Test</option><option>Pre-Board</option><option>Quarterly</option>
+    </select>
+    <select id="mfSession" onchange="filterMarks()">
+      <option value="">All Sessions</option>
+      <option>2025-26</option><option>2024-25</option><option>2023-24</option>
+    </select>
+    <select id="mfStatus" onchange="filterMarks()">
+      <option value="">All Status</option>
+      <option value="1">Published</option>
+      <option value="0">Draft</option>
+    </select>
+    <input type="text" id="mfSearch" oninput="filterMarks()" placeholder="Roll No or Student…" style="min-width:160px;">
+    <button class="clear-btn" style="padding:6px 14px;font-size:.78rem;" onclick="clearMarksFilter()">
+      <i class="fas fa-times" style="margin-right:4px;"></i>Clear
+    </button>
+  </div>
+
+  {% if marks %}
+  <div class="marks-table-wrap">
+  <table class="data-table" id="marksTable">
+    <thead>
+      <tr>
+        <th>#</th><th>Roll No</th><th>Student</th><th>Subject</th>
+        <th>Marks</th><th>Grade</th><th>Class No</th>
+        <th>Exam</th><th>Session</th><th>Published On</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in marks %}
+      <tr data-class="{{ m.class_name }}" data-exam="{{ m.exam_type }}"
+          data-session="{{ m.session }}" data-published="{{ m.is_published }}"
+          data-roll="{{ m.roll_no|lower }}" data-name="{{ m.student_name|lower }}">
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ m.roll_no }}</strong></td>
+        <td>{{ m.student_name }}</td>
+        <td>
+          <strong>{{ m.subject_name }}</strong>
+          {% if m.subject_code %}<br><small style="color:var(--text-light);">{{ m.subject_code }}</small>{% endif %}
+        </td>
+        <td class="text-center">
+          <strong>{{ m.marks_obtained }}</strong><span style="color:var(--text-light);">/{{ m.total_marks }}</span>
+        </td>
+        <td>
+          <span class="badge {% if m.grade in ['A+','A'] %}badge-green{% elif m.grade in ['B+','B'] %}badge-blue{% elif m.grade=='C' %}badge-yellow{% else %}badge-red{% endif %}">
+            {{ m.grade }}
+          </span>
+        </td>
+        <td>Class {{ m.semester }}</td>
+        <td style="white-space:nowrap;">{{ m.exam_type }}</td>
+        <td>{{ m.session }}</td>
+        <td style="font-size:.8rem;white-space:nowrap;">{{ m.publication_date[:10] if m.publication_date else '—' }}</td>
+        <td>
+          <span class="badge badge-{% if m.is_published %}green{% else %}red{% endif %}">
+            {% if m.is_published %}Published{% else %}Draft{% endif %}
+          </span>
+        </td>
+        <td>
+          <div style="display:flex;gap:5px;">
+            <a href="/admin/marks/toggle/{{ m.id }}"
+               class="btn-view"
+               style="font-size:.72rem;padding:5px 10px;{% if m.is_published %}background:#fef3c7;color:#92400e;border-color:#f59e0b;{% endif %}"
+               title="{% if m.is_published %}Move to Draft{% else %}Publish Now{% endif %}">
+              <i class="fas fa-{% if m.is_published %}eye-slash{% else %}eye{% endif %}"></i>
+              {% if m.is_published %}Draft{% else %}Publish{% endif %}
+            </a>
+            <a href="/admin/marks/delete/{{ m.id }}" class="btn-del"
+               onclick="return confirm('Delete this mark entry?')">
+              <i class="fas fa-trash"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+  {% else %}
+  <div style="text-align:center;padding:50px;color:var(--text-light);">
+    <i class="fas fa-chart-bar" style="font-size:2.5rem;opacity:.2;display:block;margin-bottom:12px;"></i>
+    No marks entered yet.
+  </div>
+  {% endif %}
+</div>
+
+<!-- ── ADD MARKS MODAL ── -->
+<div class="modal-overlay" id="addMarkModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addMarkModal')"><i class="fas fa-times"></i></button>
+    <h3 style="margin-bottom:16px;"><i class="fas fa-chart-bar" style="color:var(--gold);margin-right:8px;"></i>Add Marks</h3>
+
+    <!-- STUDENT CARD -->
+    <div class="stu-info-bar">
+      <div class="sib-item"><span class="sib-lbl">Student Name</span><span class="sib-val gold" id="am_name"></span></div>
+      <div class="sib-item"><span class="sib-lbl">Roll No</span><span class="sib-val" id="am_roll"></span></div>
+      <div class="sib-item"><span class="sib-lbl">Class / Section</span><span class="sib-val" id="am_class"></span></div>
+    </div>
+
+    <form action="/admin/marks/add-bulk" method="POST" id="bulkMarksForm">
+      <input type="hidden" name="roll_no"      id="am_roll_h">
+      <input type="hidden" name="student_name" id="am_name_h">
+      <input type="hidden" name="class_name"   id="am_class_h">
+
+      <!-- EXAM SETTINGS -->
+      <div class="exam-settings">
+        <div class="fg">
+          <label>Class No *</label>
+          <input name="class_no" id="am_class_no" type="number" min="1" max="12" placeholder="e.g. 9" required>
+        </div>
+        <div class="fg">
+          <label>Exam Type *</label>
+          <select name="exam_type" id="am_exam">
+            <option>Annual</option><option>Half-Yearly</option>
+            <option>Unit Test</option><option>Pre-Board</option><option>Quarterly</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Session *</label>
+          <select name="session" id="am_session">
+            <option>2025-26</option><option>2024-25</option><option>2023-24</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Publication Date</label>
+          <input name="publication_date" type="date" id="am_pubdate">
+          <small style="color:var(--text-light);font-size:.7rem;">Blank = today's date</small>
+        </div>
+        <div class="fg">
+          <label>Publish?</label>
+          <div class="pub-toggle" style="padding-top:4px;">
+            <input type="checkbox" name="is_published" id="am_ispub" value="1" checked>
+            <label for="am_ispub"><strong>Publish now</strong><br><small style="color:var(--text-light);">Uncheck = Draft</small></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- SUBJECTS TABLE -->
+      <div class="subj-section-title">
+        <i class="fas fa-book" style="color:var(--gold);"></i> Subjects &amp; Marks
+        <span style="font-size:.72rem;color:var(--text-light);font-weight:400;margin-left:auto;">Fill only the subjects you need — remove empty rows before saving</span>
+      </div>
+      <div class="subj-col-heads">
+        <span>Subject Name *</span><span>Subject Code</span><span>Max Marks</span><span>Obtained *</span><span>Credits</span><span></span>
+      </div>
+      <div id="subjectRows"></div>
+      <button type="button" class="add-subject-btn" onclick="addSubjectRow()">
+        <i class="fas fa-plus-circle"></i>&nbsp; Add Another Subject
+      </button>
+
+      <button type="submit" class="submit-btn" style="margin-top:16px;width:100%;">
+        <i class="fas fa-save" style="margin-right:7px;"></i>Save All Marks
+      </button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const SUBJECTS = ['Mathematics','Physics','Chemistry','Biology','English','Hindi',
+  'Sanskrit','History','Geography','Social Science','Science','Computer',
+  'Economics','Accountancy','Business Studies','EVS','Physical Education'];
+
+function subjectOptions(selected='') {
+  return `<option value="">-- Subject --</option>` +
+    SUBJECTS.map(s => `<option value="${s}"${s===selected?' selected':''}>${s}</option>`).join('');
+}
+
+function addSubjectRow(name='', code='', total=100, obtained='', credits=4) {
+  const div = document.createElement('div');
+  div.className = 'subject-row';
+  div.innerHTML = `
+    <select name="subject_name[]" required><option value="">-- Subject --</option>
+      ${SUBJECTS.map(s=>`<option value="${s}"${s===name?' selected':''}>${s}</option>`).join('')}
+    </select>
+    <input type="text"   name="subject_code[]"  value="${code}"     placeholder="e.g. MTH101">
+    <input type="number" name="total_marks[]"   value="${total}"    min="1" max="200" required>
+    <input type="number" name="marks_obtained[]" value="${obtained}" min="0" max="200" placeholder="Marks" required>
+    <input type="number" name="credits[]"        value="${credits}"  min="1" max="6">
+    <button type="button" class="remove-row-btn" onclick="removeRow(this)"><i class="fas fa-times"></i></button>`;
+  document.getElementById('subjectRows').appendChild(div);
+}
+
+function removeRow(btn) {
+  const rows = document.getElementById('subjectRows');
+  if (rows.children.length > 1) btn.closest('.subject-row').remove();
+  else { btn.closest('.subject-row').querySelectorAll('input,select').forEach(el=>el.value=''); }
+}
+
+function openAddMarks(roll, name, cls, section) {
+  document.getElementById('am_name').textContent  = name;
+  document.getElementById('am_roll').textContent  = roll;
+  document.getElementById('am_class').textContent = cls + ' — Section ' + section;
+  document.getElementById('am_roll_h').value  = roll;
+  document.getElementById('am_name_h').value  = name;
+  document.getElementById('am_class_h').value = cls;
+  const num = cls.replace(/\D/g,'');
+  document.getElementById('am_class_no').value = num || '';
+  // Sync session + exam from filter
+  document.getElementById('am_session').value = document.getElementById('filterSession')?.value || '2025-26';
+  document.getElementById('am_exam').value    = document.getElementById('filterExam')?.value    || 'Annual';
+  // Reset rows
+  document.getElementById('subjectRows').innerHTML = '';
+  for (let i = 0; i < 6; i++) addSubjectRow();
+  openModal('addMarkModal');
+}
+
+/* ── STUDENT FILTER ── */
+function filterStudents() {
+  const cls  = document.getElementById('filterClass').value;
+  const sec  = document.getElementById('filterSection').value;
+  const q    = document.getElementById('searchStudent').value.toLowerCase();
+  let vis = 0;
+  document.querySelectorAll('#studentTable tbody tr[data-name]').forEach(r => {
+    const ok = (!cls || r.dataset.class === cls)
+            && (!sec || r.dataset.section === sec)
+            && (!q   || r.dataset.name.includes(q) || r.dataset.roll.includes(q));
+    r.style.display = ok ? '' : 'none';
+    if (ok) vis++;
+  });
+  document.getElementById('studentCount').textContent = `(${vis} shown)`;
+}
+
+function clearFilters() {
+  ['filterClass','filterSection'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('searchStudent').value = '';
+  filterStudents();
+}
+
+/* ── MARKS TABLE FILTER ── */
+function filterMarks() {
+  const cls  = document.getElementById('mfClass').value;
+  const exam = document.getElementById('mfExam').value;
+  const sess = document.getElementById('mfSession').value;
+  const stat = document.getElementById('mfStatus').value;
+  const q    = document.getElementById('mfSearch').value.toLowerCase();
+  let vis = 0, idx = 1;
+  document.querySelectorAll('#marksTable tbody tr[data-class]').forEach(r => {
+    const ok = (!cls  || r.dataset.class === cls)
+            && (!exam || r.dataset.exam === exam)
+            && (!sess || r.dataset.session === sess)
+            && (!stat || r.dataset.published === stat)
+            && (!q    || r.dataset.roll.includes(q) || r.dataset.name.includes(q));
+    r.style.display = ok ? '' : 'none';
+    if (ok) { r.cells[0].textContent = idx++; vis++; }
+  });
+  document.getElementById('marksCount').textContent = `(${vis} shown)`;
+}
+
+function clearMarksFilter() {
+  ['mfClass','mfExam','mfSession','mfStatus'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('mfSearch').value = '';
+  filterMarks();
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  filterStudents();
+  filterMarks();
+});
+</script>
+{% endblock %}

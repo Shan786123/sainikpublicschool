@@ -1,0 +1,72 @@
+{% extends "admin_base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block admin_content %}
+<div class="stats-row">
+  <div class="stat-card blue"><div class="stat-icon"><i class="fas fa-user-graduate"></i></div><span class="stat-num">{{ stats.students }}</span><div class="stat-lbl">Students</div></div>
+  <div class="stat-card gold"><div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div><span class="stat-num">{{ stats.staff }}</span><div class="stat-lbl">Staff</div></div>
+  <div class="stat-card green"><div class="stat-icon"><i class="fas fa-chart-bar"></i></div><span class="stat-num">{{ stats.results }}</span><div class="stat-lbl">Results</div></div>
+  <div class="stat-card red"><div class="stat-icon"><i class="fas fa-envelope"></i></div><span class="stat-num">{{ stats.messages }}</span><div class="stat-lbl">Unread Msgs</div></div>
+  <div class="stat-card purple"><div class="stat-icon"><i class="fas fa-file-alt"></i></div><span class="stat-num">{{ stats.admissions }}</span><div class="stat-lbl">Pending Admis.</div></div>
+  <div class="stat-card teal"><div class="stat-icon"><i class="fas fa-bell"></i></div><span class="stat-num">{{ stats.notices }}</span><div class="stat-lbl">Active Notices</div></div>
+  <div class="stat-card" style="border-top-color:#f59e0b;"><div class="stat-icon" style="color:#f59e0b;"><i class="fas fa-exclamation-triangle"></i></div><span class="stat-num">{{ stats.backlogs }}</span><div class="stat-lbl">Pending Backlogs</div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;">
+  <!-- Recent Admissions -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3><i class="fas fa-file-alt" style="margin-right:7px"></i>Recent Admission Enquiries</h3>
+      <a href="/admin/admissions" class="add-btn">View All</a>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Class</th><th>Phone</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for a in recent_admissions %}
+        <tr>
+          <td><strong>{{ a.student_name }}</strong></td>
+          <td>{{ a.seeking_class }}</td>
+          <td>{{ a.phone }}</td>
+          <td><span class="badge badge-{% if a.status=='approved' %}green{% elif a.status=='rejected' %}red{% else %}yellow{% endif %}">{{ a.status|title }}</span></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" style="text-align:center;color:var(--text-light);padding:20px;">No enquiries yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <!-- Recent Messages -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3><i class="fas fa-envelope" style="margin-right:7px"></i>Recent Contact Messages</h3>
+      <a href="/admin/messages" class="add-btn">View All</a>
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Name</th><th>Subject</th><th>Date</th></tr></thead>
+      <tbody>
+        {% for m in recent_contacts %}
+        <tr>
+          <td><strong>{{ m.name }}</strong><br><small style="color:var(--text-light);">{{ m.phone }}</small></td>
+          <td>{{ m.subject }}</td>
+          <td style="font-size:.78rem;color:var(--text-light);">{{ m.received_at[:10] }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="3" style="text-align:center;color:var(--text-light);padding:20px;">No messages yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div style="background:var(--white);border-radius:12px;padding:22px;box-shadow:var(--shadow);margin-top:22px;">
+  <h3 style="font-family:'Playfair Display',serif;color:var(--navy);margin-bottom:16px;font-size:1.05rem;"><i class="fas fa-bolt" style="color:var(--gold);margin-right:8px"></i>Quick Actions</h3>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <a href="/admin/notices" onclick="event.preventDefault();window.location='/admin/notices'" style="background:var(--navy);color:var(--gold);padding:10px 20px;border-radius:50px;text-decoration:none;font-weight:700;font-size:.83rem;display:flex;align-items:center;gap:7px;"><i class="fas fa-bell"></i>Add Notice</a>
+    <a href="/admin/students" style="background:var(--navy);color:var(--gold);padding:10px 20px;border-radius:50px;text-decoration:none;font-weight:700;font-size:.83rem;display:flex;align-items:center;gap:7px;"><i class="fas fa-user-graduate"></i>Add Student</a>
+    <a href="/admin/staff" style="background:var(--navy);color:var(--gold);padding:10px 20px;border-radius:50px;text-decoration:none;font-weight:700;font-size:.83rem;display:flex;align-items:center;gap:7px;"><i class="fas fa-chalkboard-teacher"></i>Add Staff</a>
+    <a href="/admin/results" style="background:var(--navy);color:var(--gold);padding:10px 20px;border-radius:50px;text-decoration:none;font-weight:700;font-size:.83rem;display:flex;align-items:center;gap:7px;"><i class="fas fa-chart-bar"></i>Add Result</a>
+    <a href="/" target="_blank" style="background:var(--gray);color:var(--navy);padding:10px 20px;border-radius:50px;text-decoration:none;font-weight:700;font-size:.83rem;display:flex;align-items:center;gap:7px;border:1.5px solid var(--navy);"><i class="fas fa-globe"></i>View Website</a>
+  </div>
+</div>
+{% endblock %}

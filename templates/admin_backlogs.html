@@ -1,0 +1,82 @@
+{% extends "admin_base.html" %}
+{% block title %}Backlogs{% endblock %}
+{% block page_title %}Backlog Management{% endblock %}
+{% block admin_content %}
+<div class="table-card">
+  <div class="table-card-header">
+    <h3><i class="fas fa-exclamation-triangle" style="margin-right:7px"></i>All Backlogs ({{ backlogs|length }})</h3>
+    <button class="add-btn" onclick="openModal('addBacklog')"><i class="fas fa-plus"></i>Add Backlog</button>
+  </div>
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead>
+      <tr><th>#</th><th>Roll No</th><th>Student</th><th>Class</th><th>Subject</th><th>Class</th><th>Status</th><th>Applied</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for b in backlogs %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ b.roll_no }}</strong></td>
+        <td>{{ b.student_name }}</td>
+        <td>{{ b.class_name or '–' }}</td>
+        <td>{{ b.subject_code or '' }} {{ b.subject_name }}</td>
+        <td>Class {{ b.semester }}</td>
+        <td>
+          <span class="badge {% if b.status=='Pending' %}badge-yellow{% elif b.status=='Applied' %}badge-blue{% else %}badge-green{% endif %}">
+            {{ b.status }}
+          </span>
+        </td>
+        <td style="font-size:.78rem;color:var(--text-light);">{{ b.applied_date or '–' }}</td>
+        <td>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            {% if b.status != 'Cleared' %}
+            <a href="/admin/backlogs/update/{{ b.id }}/Cleared" class="btn-view" style="border-color:#22c55e;color:#22c55e;" onclick="return confirm('Mark as Cleared?')">✓ Clear</a>
+            {% endif %}
+            {% if b.status == 'Applied' %}
+            <a href="/admin/backlogs/update/{{ b.id }}/Pending" class="btn-view" onclick="return confirm('Reset to Pending?')">↩ Reset</a>
+            {% endif %}
+            <a href="/admin/backlogs/delete/{{ b.id }}" class="btn-del" onclick="return confirm('Delete this backlog?')"><i class="fas fa-trash"></i></a>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="9" style="text-align:center;color:var(--text-light);padding:30px;">No backlogs found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="modal-overlay" id="addBacklog">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addBacklog')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-exclamation-triangle" style="color:var(--gold);margin-right:8px"></i>Add Backlog Entry</h3>
+    <form action="/admin/backlogs/add" method="POST">
+      <div class="fg">
+        <label>Select Student *</label>
+        <select name="roll_no" onchange="fillBL(this)" required>
+          <option value="">-- Select Student --</option>
+          {% for s in students %}
+          <option value="{{ s.roll_no }}" data-name="{{ s.name }}">{{ s.roll_no }} – {{ s.name }} ({{ s.class_name }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="fg"><label>Student Name</label><input name="student_name" id="bl_sname" type="text" required readonly style="background:#f0f0f0;"></div>
+      <div class="form-row2">
+        <div class="fg"><label>Subject Code</label><input name="subject_code" type="text" placeholder="e.g. SST105"></div>
+        <div class="fg"><label>Subject Name *</label><input name="subject_name" type="text" placeholder="e.g. Social Science" required></div>
+      </div>
+      <div class="fg"><label>Class * (e.g. 10 for Class X)</label><input name="class_no" type="number" placeholder="e.g. 10" min="1" max="12" required></div>
+      <button type="submit" class="submit-btn"><i class="fas fa-save" style="margin-right:7px"></i>Add Backlog</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block extra_scripts %}
+<script>
+function fillBL(sel){
+  const opt=sel.options[sel.selectedIndex];
+  document.getElementById('bl_sname').value=opt.dataset.name||'';
+}
+</script>
+{% endblock %}

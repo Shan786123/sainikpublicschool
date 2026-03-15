@@ -1,0 +1,70 @@
+# ── DATABASE ──────────────────────────────────
+# Never upload — contains all real student/staff data
+school.db
+*.db
+*.sqlite
+*.sqlite3
+
+# ── SECRET / CONFIG ───────────────────────────
+# If you ever move secret_key to a .env file
+.env
+.env.local
+.env.production
+*.env
+config.py
+secrets.py
+
+# ── UPLOADED PHOTOS ───────────────────────────
+# Real student/staff photos should NOT go on GitHub
+# The folders themselves are kept (via .gitkeep) but photos are ignored
+static/uploads/students/*
+static/uploads/staff/*
+static/uploads/gallery/*
+# Keep the empty folders on GitHub so the app doesn't crash
+!static/uploads/students/.gitkeep
+!static/uploads/staff/.gitkeep
+!static/uploads/gallery/.gitkeep
+
+# ── PYTHON CACHE ──────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+
+# ── VIRTUAL ENVIRONMENT ───────────────────────
+venv/
+env/
+.venv/
+.env/
+ENV/
+virtualenv/
+
+# ── IDE / EDITOR FILES ────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── LOGS ──────────────────────────────────────
+*.log
+logs/
+
+# ── OS FILES ──────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# ── MISC ──────────────────────────────────────
+*.zip
+*.tar.gz
+*.bak
+*.swp
+*.tmp

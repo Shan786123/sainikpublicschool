@@ -1,0 +1,711 @@
+{% extends "base.html" %}
+{% block title %}Sainik Public School – Home{% endblock %}
+
+{% block extra_head %}
+<style>
+/* HERO */
+.hero{position:relative;height:88vh;min-height:520px;overflow:hidden;}
+.slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease;display:flex;align-items:center;}
+.slide.active{opacity:1;}
+.slide-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+.slide-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,rgba(10,31,68,.83) 40%,rgba(10,31,68,.35) 100%);}
+.s1 .slide-bg{background:linear-gradient(135deg,#0a1f44 0%,#1a3170 40%,#0d2d5c 100%);}
+.s2 .slide-bg{background:linear-gradient(135deg,#112259 0%,#0a1f44 60%,#1e3a6e 100%);}
+.s3 .slide-bg{background:linear-gradient(135deg,#0d2a56 0%,#0a1f44 50%,#162b5a 100%);}
+.slide-pattern{position:absolute;inset:0;opacity:.06;background-image:repeating-linear-gradient(45deg,#c9a84c 0,#c9a84c 1px,transparent 0,transparent 50%);background-size:20px 20px;}
+.hero-content{position:relative;z-index:2;max-width:1200px;margin:auto;padding:0 24px;width:100%;}
+.hero-badge{display:inline-block;background:var(--gold);color:var(--navy);font-size:.72rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 16px;border-radius:20px;margin-bottom:16px;}
+.hero h1{font-family:'Playfair Display',serif;color:#fff;font-size:clamp(2rem,5vw,3.6rem);font-weight:900;line-height:1.13;margin-bottom:18px;max-width:640px;}
+.hero h1 span{color:var(--gold-light);}
+.hero p{color:rgba(255,255,255,.85);font-size:1rem;max-width:500px;margin-bottom:28px;line-height:1.75;}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-hero-p{background:var(--gold);color:var(--navy);padding:12px 28px;border-radius:50px;font-weight:700;font-size:.875rem;text-decoration:none;transition:all .25s;border:2px solid var(--gold);}
+.btn-hero-p:hover{background:transparent;color:var(--gold);transform:translateY(-2px);}
+.btn-hero-o{background:transparent;color:#fff;padding:12px 28px;border-radius:50px;font-weight:700;font-size:.875rem;text-decoration:none;transition:all .25s;border:2px solid rgba(255,255,255,.45);}
+.btn-hero-o:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px);}
+.slider-dots{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:9px;z-index:10;}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.35);cursor:pointer;transition:all .3s;}
+.dot.active{background:var(--gold);transform:scale(1.3);}
+.sarrow{position:absolute;top:50%;transform:translateY(-50%);z-index:10;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s;font-size:1rem;}
+.sarrow:hover{background:var(--gold);color:var(--navy);border-color:var(--gold);}
+.sarrow.left{left:18px;} .sarrow.right{right:18px;}
+
+/* STATS */
+.stats-strip{background:var(--navy);border-top:3px solid var(--gold);}
+.stats-inner{max-width:1200px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);}
+.stat-item{padding:26px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.07);transition:background .25s;}
+.stat-item:hover{background:rgba(201,168,76,.08);}
+.stat-item:last-child{border-right:none;}
+.stat-num{font-family:'Playfair Display',serif;font-size:2.1rem;font-weight:900;color:var(--gold);display:block;}
+.stat-label{font-size:.75rem;color:rgba(255,255,255,.6);letter-spacing:1px;text-transform:uppercase;margin-top:4px;}
+
+/* NOTICE + QUICK LINKS */
+.notice-section{background:var(--cream);padding:72px 0;}
+.notice-grid{display:grid;grid-template-columns:1fr 300px;gap:36px;align-items:start;}
+.notice-board{background:var(--white);border-radius:14px;overflow:hidden;box-shadow:var(--shadow);border:1px solid #e8e0d0;}
+.notice-header{background:var(--navy);color:#fff;padding:14px 22px;display:flex;align-items:center;gap:10px;}
+.notice-header i{color:var(--gold);}
+.notice-header h3{font-family:'Playfair Display',serif;font-size:1.05rem;}
+.notice-ticker{overflow:hidden;height:270px;}
+.notice-list{animation:ticker 20s linear infinite;}
+.notice-list:hover{animation-play-state:paused;}
+@keyframes ticker{0%{transform:translateY(0);}100%{transform:translateY(-50%);}}
+.notice-item{padding:13px 20px;border-bottom:1px solid #f0ece4;display:flex;gap:10px;align-items:flex-start;}
+.ndot{width:8px;height:8px;background:var(--gold);border-radius:50%;margin-top:6px;flex-shrink:0;}
+.notice-item p{font-size:.86rem;color:var(--text);line-height:1.5;}
+.notice-item .ndate{font-size:.72rem;color:var(--text-light);margin-top:2px;display:block;}
+.nbadge{background:var(--gold);color:var(--navy);font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:4px;margin-left:5px;}
+.quick-links{display:flex;flex-direction:column;gap:10px;}
+.qlink{background:var(--white);border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--navy);box-shadow:var(--shadow);transition:all .25s;border-left:4px solid var(--gold);font-weight:600;font-size:.86rem;}
+.qlink i{color:var(--gold);width:20px;text-align:center;}
+.qlink:hover{background:var(--navy);color:var(--gold);transform:translateX(5px);}
+
+/* ABOUT */
+.about-section{padding:72px 0;}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;}
+.about-visual{position:relative;}
+.about-card{width:100%;aspect-ratio:4/3;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);border-radius:16px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-lg);}
+.ac-emoji{font-size:7rem;opacity:.1;position:absolute;}
+.ac-text{position:relative;z-index:2;text-align:center;color:#fff;padding:28px;}
+.ac-text h2{font-family:'Playfair Display',serif;font-size:1.8rem;color:var(--gold);margin-bottom:8px;}
+.ac-text p{font-size:.88rem;opacity:.75;line-height:1.6;}
+.about-badge{position:absolute;bottom:-18px;right:-18px;width:100px;height:100px;background:var(--gold);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(201,168,76,.4);color:var(--navy);text-align:center;}
+.about-badge .bnum{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;line-height:1;}
+.about-badge .btxt{font-size:.6rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.about-feats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px;}
+.af{background:var(--cream);border-radius:9px;padding:12px 14px;display:flex;gap:10px;align-items:flex-start;border-left:3px solid var(--gold);}
+.af i{color:var(--gold-dark);font-size:.95rem;margin-top:2px;}
+.af h4{font-size:.83rem;font-weight:700;color:var(--navy);}
+.af p{font-size:.76rem;color:var(--text-light);margin-top:1px;}
+
+/* FEATURES */
+.feat-section{background:var(--gray);padding:72px 0;}
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+.feat-card{background:var(--white);border-radius:13px;padding:28px 22px;text-align:center;box-shadow:var(--shadow);transition:all .3s;border-bottom:3px solid transparent;}
+.feat-card:hover{transform:translateY(-5px);border-bottom-color:var(--gold);box-shadow:var(--shadow-lg);}
+.feat-icon{width:60px;height:60px;background:linear-gradient(135deg,var(--navy),var(--navy-light));border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 5px 18px rgba(10,31,68,.2);}
+.feat-icon i{color:var(--gold);font-size:1.4rem;}
+.feat-card h3{font-family:'Playfair Display',serif;font-size:.97rem;color:var(--navy);margin-bottom:8px;}
+.feat-card p{font-size:.82rem;color:var(--text-light);line-height:1.65;}
+
+/* COURSES */
+.course-section{background:var(--navy);padding:72px 0;}
+.course-section .section-title{color:#fff;}
+.course-section .section-label{color:var(--gold-light);}
+.courses-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.cc{background:rgba(255,255,255,.05);border-radius:13px;padding:28px 24px;border:1px solid rgba(201,168,76,.2);transition:all .3s;position:relative;overflow:hidden;}
+.cc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light));transform:scaleX(0);transition:transform .3s;}
+.cc:hover{background:rgba(255,255,255,.09);transform:translateY(-5px);}
+.cc:hover::before{transform:scaleX(1);}
+.cc-icon{width:52px;height:52px;background:rgba(201,168,76,.12);border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;border:1px solid rgba(201,168,76,.25);}
+.cc-icon i{color:var(--gold);font-size:1.3rem;}
+.cc h3{font-family:'Playfair Display',serif;color:#fff;font-size:1.1rem;margin-bottom:5px;}
+.cc .level{color:var(--gold);font-size:.73rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;}
+.cc p{color:rgba(255,255,255,.6);font-size:.84rem;line-height:1.6;}
+.tags{margin-top:16px;display:flex;flex-wrap:wrap;gap:5px;}
+.tag{background:rgba(201,168,76,.1);color:var(--gold-light);font-size:.7rem;padding:3px 9px;border-radius:20px;border:1px solid rgba(201,168,76,.22);font-weight:600;}
+
+/* PRINCIPAL */
+.msg-section{padding:72px 0;}
+/* .msg-grid{display:grid;grid-template-columns:280px 1fr;gap:52px;align-items:center;} */
+.msg-grid{display:grid;grid-template-columns:280px 1fr;gap:52px;align-items:center;}
+.msg-grid-reverse{grid-template-columns:1fr 280px;}
+.principal-card{background:var(--navy);border-radius:15px;padding:32px 24px;text-align:center;box-shadow:var(--shadow-lg);position:relative;}
+.principal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:15px 15px 0 0;}
+.p-avatar{width:100px;height:100px;background:rgba(201,168,76,.12);border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;border:3px solid var(--gold);}
+.p-avatar i{font-size:3.2rem;color:var(--gold);opacity:.8;}
+.principal-card h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.15rem;margin-bottom:4px;}
+.principal-card .ptitle{color:rgba(255,255,255,.6);font-size:.75rem;letter-spacing:1px;text-transform:uppercase;}
+.principal-card .pqual{color:rgba(255,255,255,.45);font-size:.75rem;margin-top:4px;}
+.msg-text .quote{font-family:'Playfair Display',serif;font-size:3rem;color:var(--gold);line-height:1;display:block;margin-bottom:6px;}
+.msg-text p{color:var(--text);font-size:.93rem;line-height:1.85;margin-bottom:12px;}
+.sig{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);font-style:italic;margin-top:18px;}
+
+/* STAFF */
+.staff-section{background:var(--gray);padding:72px 0;}
+.staff-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+.staff-card{background:var(--white);border-radius:13px;overflow:hidden;box-shadow:var(--shadow);transition:all .3s;text-align:center;}
+.staff-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-lg);}
+.s-avatar{width:100%;aspect-ratio:1;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.s-avatar i{font-size:3.5rem;color:rgba(201,168,76,.25);}
+.s-initials{position:absolute;font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--gold);opacity:.82;}
+.s-avatar img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0;}
+.s-info{padding:16px 14px;}
+.s-info h4{font-family:'Playfair Display',serif;font-size:.95rem;color:var(--navy);margin-bottom:3px;}
+.s-info .srole{font-size:.75rem;color:var(--gold-dark);font-weight:700;letter-spacing:.3px;}
+.s-info .ssubj{font-size:.75rem;color:var(--text-light);margin-top:3px;}
+
+/* GALLERY */
+.gallery-section{background:var(--cream);padding:72px 0;}
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;}
+.gi{border-radius:10px;overflow:hidden;position:relative;background:linear-gradient(135deg,var(--navy),var(--navy-light));cursor:pointer;}
+.gi img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s;}
+.gi:hover img{transform:scale(1.06);}
+.gi-no-photo{width:100%;height:100%;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:rgba(255,255,255,.3);font-size:2.5rem;}
+.gi{border-radius:10px;overflow:hidden;position:relative;aspect-ratio:1;cursor:pointer;background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);transition:transform .3s;}
+.gi:hover{transform:scale(1.04);z-index:2;}
+.gi.tall{grid-row:span 2;aspect-ratio:auto;}
+.gi.wide{grid-column:span 2;aspect-ratio:2/1;}
+.gi-overlay{position:absolute;inset:0;background:rgba(10,31,68,.65);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;}
+.gi:hover .gi-overlay{opacity:1;}
+.gi-overlay i{color:var(--gold);font-size:1.8rem;}
+.gi-label{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(10,31,68,.82));color:var(--gold-light);font-size:.76rem;font-weight:600;padding:18px 10px 9px;}
+.gi-emoji{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:3rem;opacity:.18;color:var(--gold);}
+
+/* CONTACT */
+.contact-section{background:var(--navy);padding:72px 0;}
+.contact-section .section-title{color:#fff;}
+.contact-section .section-label{color:var(--gold-light);}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;}
+.cic{background:rgba(255,255,255,.06);border-radius:11px;padding:18px 20px;display:flex;gap:14px;align-items:center;border-left:3px solid var(--gold);transition:background .25s;margin-bottom:14px;}
+.cic:hover{background:rgba(255,255,255,.1);}
+.cic-icon{width:42px;height:42px;background:rgba(201,168,76,.14);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.cic-icon i{color:var(--gold);}
+.cic h4{color:rgba(255,255,255,.5);font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px;}
+.cic p{color:#fff;font-size:.88rem;font-weight:500;}
+.contact-form{background:rgba(255,255,255,.05);border-radius:13px;padding:28px;border:1px solid rgba(255,255,255,.07);}
+.contact-form h3{font-family:'Playfair Display',serif;color:var(--gold);font-size:1.2rem;margin-bottom:20px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fg{margin-bottom:14px;}
+.fg label{display:block;color:rgba(255,255,255,.6);font-size:.78rem;margin-bottom:5px;font-weight:600;}
+.fg input,.fg textarea,.fg select{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:7px;padding:10px 13px;color:#fff;font-family:'Mulish',sans-serif;font-size:.86rem;transition:border-color .25s;outline:none;}
+.fg input::placeholder,.fg textarea::placeholder{color:rgba(255,255,255,.3);}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--gold);}
+.fg textarea{resize:vertical;min-height:100px;}
+.fg select option{background:var(--navy);}
+.btn-submit{background:var(--gold);color:var(--navy);border:none;padding:12px 32px;border-radius:50px;font-family:'Mulish',sans-serif;font-weight:700;font-size:.875rem;cursor:pointer;transition:all .25s;}
+.btn-submit:hover{background:var(--gold-light);transform:translateY(-2px);}
+
+/* PORTALS */
+.portal-section{background:var(--gray);padding:72px 0;}
+.portal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.portal-card{background:var(--white);border-radius:13px;padding:32px 24px;text-align:center;box-shadow:var(--shadow);transition:all .3s;border-top:4px solid transparent;text-decoration:none;color:inherit;display:block;}
+.portal-card:hover{border-top-color:var(--gold);transform:translateY(-5px);box-shadow:var(--shadow-lg);}
+.portal-icon{width:66px;height:66px;background:linear-gradient(135deg,var(--navy),var(--navy-light));border-radius:18px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;box-shadow:0 5px 18px rgba(10,31,68,.2);}
+.portal-icon i{color:var(--gold);font-size:1.7rem;}
+.portal-card h3{font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--navy);margin-bottom:7px;}
+.portal-card p{font-size:.83rem;color:var(--text-light);line-height:1.6;}
+.portal-action{display:inline-block;margin-top:16px;color:var(--gold-dark);font-weight:700;font-size:.8rem;}
+
+@media(max-width:1024px){.feat-grid{grid-template-columns:repeat(2,1fr);}  .staff-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){
+  .hero{height:75vh;} .stats-inner{grid-template-columns:repeat(2,1fr);}
+  .notice-grid{grid-template-columns:1fr;} .about-grid{grid-template-columns:1fr;}
+  .courses-grid{grid-template-columns:1fr;} .feat-grid{grid-template-columns:1fr;}
+  /* .msg-grid{grid-template-columns:1fr;} .contact-grid{grid-template-columns:1fr;} */
+  .msg-grid,.msg-grid-reverse{grid-template-columns:1fr;} .contact-grid{grid-template-columns:1fr;}
+  .portal-grid{grid-template-columns:1fr;} .gallery-grid{grid-template-columns:repeat(2,1fr);}
+  .gi.wide{grid-column:span 1;aspect-ratio:1;} .gi.tall{grid-row:span 1;aspect-ratio:1;}
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ADMISSION TICKER -->
+<div class="admission-band">
+  <span class="ticker-text">
+    <i class="fas fa-star"></i> Admissions Open for Session 2026-27 — Nursery to Class XII
+    <i class="fas fa-star"></i> Excellence in Education Since Establishment
+    <i class="fas fa-star"></i> Affiliated with CBSE Board
+    <i class="fas fa-star"></i> Call: 9119673130 for Enquiry
+    <i class="fas fa-star"></i> Building Tomorrow's Leaders Today
+    <i class="fas fa-star"></i> Admissions Open for Session 2026-27 — Nursery to Class XII
+    <i class="fas fa-star"></i> Excellence in Education Since Establishment
+  </span>
+</div>
+
+<!-- HERO SLIDER -->
+<section class="hero" id="home">
+  <div class="slide s1 active">
+    <div class="slide-bg"></div><div class="slide-pattern"></div>
+    <div class="hero-content">
+      <span class="hero-badge"><i class="fas fa-award" style="margin-right:6px"></i>Trusted School of Excellence</span>
+      <h1>Shaping Future <span>Leaders</span> with Knowledge & Discipline</h1>
+      <p>World-class education from Nursery to Class XII, nurturing every child's potential in a disciplined and inspiring environment.</p>
+      <div class="hero-btns">
+        <a href="#admission-form" class="btn-hero-p"><i class="fas fa-file-alt" style="margin-right:7px"></i>Apply for Admission</a>
+        <a href="#about" class="btn-hero-o"><i class="fas fa-info-circle" style="margin-right:7px"></i>Learn More</a>
+      </div>
+    </div>
+  </div>
+  <div class="slide s2">
+    <div class="slide-bg"></div><div class="slide-pattern"></div>
+    <div class="hero-content">
+      <span class="hero-badge"><i class="fas fa-graduation-cap" style="margin-right:6px"></i>Nursery to Class XII</span>
+      <h1>Academic <span>Excellence</span> Meets Holistic Development</h1>
+      <p>Our curriculum blends rigorous academics with sports, arts, and character-building activities — creating well-rounded individuals.</p>
+      <div class="hero-btns">
+        <a href="#courses" class="btn-hero-p"><i class="fas fa-book-open" style="margin-right:7px"></i>Explore Courses</a>
+        <a href="#staff" class="btn-hero-o"><i class="fas fa-users" style="margin-right:7px"></i>Meet Our Staff</a>
+      </div>
+    </div>
+  </div>
+  <div class="slide s3">
+    <div class="slide-bg"></div><div class="slide-pattern"></div>
+    <div class="hero-content">
+      <span class="hero-badge"><i class="fas fa-shield-alt" style="margin-right:6px"></i>Sainik Values & Tradition</span>
+      <h1>Discipline, <span>Integrity</span> & National Pride</h1>
+      <p>Rooted in the proud Sainik tradition, we instill values of patriotism, discipline and respect — preparing students for a bright future.</p>
+      <div class="hero-btns">
+        <a href="#gallery" class="btn-hero-p"><i class="fas fa-images" style="margin-right:7px"></i>View Gallery</a>
+        <a href="#contact" class="btn-hero-o"><i class="fas fa-phone" style="margin-right:7px"></i>Contact Us</a>
+      </div>
+    </div>
+  </div>
+  <button class="sarrow left" onclick="changeSlide(-1)"><i class="fas fa-chevron-left"></i></button>
+  <button class="sarrow right" onclick="changeSlide(1)"><i class="fas fa-chevron-right"></i></button>
+  <div class="slider-dots">
+    <div class="dot active" onclick="goToSlide(0)"></div>
+    <div class="dot" onclick="goToSlide(1)"></div>
+    <div class="dot" onclick="goToSlide(2)"></div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div class="stats-inner">
+    <div class="stat-item"><span class="stat-num" data-target="{{ stats.students }}">0</span><span class="stat-label">Total Students</span></div>
+    <div class="stat-item"><span class="stat-num" data-target="{{ stats.staff }}">0</span><span class="stat-label">Qualified Teachers</span></div>
+    <div class="stat-item"><span class="stat-num" data-target="5">0</span><span class="stat-label">Awards Won</span></div>
+    <div class="stat-item"><span class="stat-num" data-target="8">0</span><span class="stat-label">Years of Excellence</span></div>
+  </div>
+</div>
+
+<!-- NOTICE + QUICK LINKS -->
+<section class="notice-section" id="notices">
+  <div class="container">
+    <div class="notice-grid">
+      <div>
+        <span class="section-label">Latest Updates</span>
+        <div class="divider"></div>
+        <h2 class="section-title">Notice <span>Board</span></h2>
+        <div class="notice-board">
+          <div class="notice-header"><i class="fas fa-bell"></i><h3>School Notices & Announcements</h3></div>
+          <div class="notice-ticker">
+            <div class="notice-list">
+              {% for n in notices %}
+              <div class="notice-item">
+                <div class="ndot"></div>
+                <div>
+                  <p>{{ n.title }}{% if n.is_important %}<span class="nbadge">IMPORTANT</span>{% endif %}</p>
+                  <span class="ndate">{{ n.published_date[:10] if n.published_date else '' }}</span>
+                </div>
+              </div>
+              {% endfor %}
+              {% for n in notices %}
+              <div class="notice-item">
+                <div class="ndot"></div>
+                <div>
+                  <p>{{ n.title }}{% if n.is_important %}<span class="nbadge">IMPORTANT</span>{% endif %}</p>
+                  <span class="ndate">{{ n.published_date[:10] if n.published_date else '' }}</span>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <span class="section-label">Quick Access</span>
+        <div class="divider"></div>
+        <h2 class="section-title">Quick <span>Links</span></h2>
+        <div class="quick-links">
+          <a class="qlink" href="/student/login"><i class="fas fa-user-graduate"></i>Student Portal Login</a>
+          <a class="qlink" href="/result"><i class="fas fa-poll-h"></i>Check Exam Result</a>
+          <a class="qlink" href="#staff"><i class="fas fa-chalkboard-teacher"></i>View Staff List</a>
+          <a class="qlink" href="#admission-form"><i class="fas fa-file-alt"></i>Admission Form</a>
+          <a class="qlink" href="#contact"><i class="fas fa-phone-alt"></i>Contact School</a>
+          <a class="qlink" href="/admin/login"><i class="fas fa-lock"></i>Admin Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about-section" id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-visual">
+        <div class="about-card">
+          
+          <div class="ac-emoji">🏫</div>
+          <div class="ac-text">
+            <h2>Sainik Public School</h2>
+            <h2>Bahadurganj, Uttar Pradesh</h2>
+            <p>Excellence in Education<br>Since Establishment</p>
+            <div style="margin-top:14px">
+              <span style="display:inline-block;background:rgba(201,168,76,.18);color:var(--gold-light);font-size:.72rem;padding:4px 12px;border-radius:20px;border:1px solid rgba(201,168,76,.28);margin:3px;">CBSE Board Affiliated</span>
+              <span style="display:inline-block;background:rgba(201,168,76,.18);color:var(--gold-light);font-size:.72rem;padding:4px 12px;border-radius:20px;border:1px solid rgba(201,168,76,.28);margin:3px;">8+ Years</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-badge"><span class="bnum">8+</span><span class="btxt">Years of<br>Excellence</span></div>
+      </div>
+      <div>
+        <span class="section-label">Who We Are</span>
+        <div class="divider"></div>
+        <h2 class="section-title">Welcome to <span>Sainik Public School</span></h2>
+        <p style="color:var(--text);font-size:.93rem;line-height:1.85;margin-bottom:14px;">
+          Sainik Public School is a premier educational institution rooted in the noble tradition of the Sainik ethos — discipline, integrity, and service to the nation. We offer holistic education from Nursery to Class XII, nurturing young minds with academic rigor, moral values, and all-round development.
+        </p>
+        <p style="color:var(--text-light);font-size:.88rem;line-height:1.8;margin-bottom:26px;">
+          Our school fosters a close partnership between students, teachers, and parents — creating a learning environment where every child can discover their unique strengths and grow into confident, responsible citizens.
+        </p>
+        <div class="about-feats">
+          <div class="af"><i class="fas fa-graduation-cap"></i><div><h4>Expert Faculty</h4><p>{{ stats.staff }}+ trained educators</p></div></div>
+          <div class="af"><i class="fas fa-laptop"></i><div><h4>Smart Classrooms</h4><p>Digital learning</p></div></div>
+          <div class="af"><i class="fas fa-trophy"></i><div><h4>Award Winning</h4><p>5+ inter-school awards</p></div></div>
+          <div class="af"><i class="fas fa-shield-alt"></i><div><h4>Safe Campus</h4><p>Secure premises</p></div></div>
+        </div>
+        <div style="margin-top:24px;">
+          <a href="#courses" class="btn-primary" style="margin-right:12px;">View Courses</a>
+          <a href="#contact" class="btn-outline">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FACILITIES -->
+<section class="feat-section">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:44px;">
+      <span class="section-label">What We Offer</span>
+      <div class="divider" style="margin:0 auto 14px;"></div>
+      <h2 class="section-title">Our Key <span>Facilities</span></h2>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon"><i class="fas fa-book"></i></div><h3>Rich Library</h3><p>Thousands of books, journals and digital resources to support learning beyond the classroom.</p></div>
+      <div class="feat-card"><div class="feat-icon"><i class="fas fa-flask"></i></div><h3>Science Labs</h3><p>Fully equipped Physics, Chemistry and Biology labs for hands-on experimental learning.</p></div>
+      <div class="feat-card"><div class="feat-icon"><i class="fas fa-desktop"></i></div><h3>Computer Lab</h3><p>Modern computers with high-speed internet to develop digital literacy and coding skills.</p></div>
+      <div class="feat-card"><div class="feat-icon"><i class="fas fa-running"></i></div><h3>Sports Ground</h3><p>Spacious playground for Cricket, Football, Kabaddi and more — promoting physical fitness.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES -->
+<section class="course-section" id="courses">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:44px;">
+      <span class="section-label">Academic Programs</span>
+      <div class="divider" style="margin:0 auto 14px;background:linear-gradient(90deg,var(--gold),transparent);"></div>
+      <h2 class="section-title">Courses We <span style="color:var(--gold-light);">Offer</span></h2>
+    </div>
+    <div class="courses-grid">
+      <div class="cc"><div class="cc-icon"><i class="fas fa-child"></i></div><h3>Primary School</h3><div class="level">Nursery — Class V</div><p>A strong foundation through play-based and activity-driven learning.</p><div class="tags"><span class="tag">English</span><span class="tag">Hindi</span><span class="tag">Maths</span><span class="tag">EVS</span></div></div>
+      <div class="cc"><div class="cc-icon"><i class="fas fa-school"></i></div><h3>Middle School</h3><div class="level">Class VI — VIII</div><p>Expanding academic horizons with core subjects and co-curricular activities.</p><div class="tags"><span class="tag">Science</span><span class="tag">Maths</span><span class="tag">Sanskrit</span><span class="tag">Computer</span></div></div>
+      <div class="cc"><div class="cc-icon"><i class="fas fa-book-reader"></i></div><h3>Secondary</h3><div class="level">Class IX — X</div><p>Rigorous board preparation with strong emphasis on conceptual clarity.</p><div class="tags"><span class="tag">Science</span><span class="tag">Maths</span><span class="tag">Hindi</span><span class="tag">English</span></div></div>
+      <div class="cc"><div class="cc-icon"><i class="fas fa-atom"></i></div><h3>Science Stream</h3><div class="level">Class XI — XII</div><p>Physics, Chemistry + Maths/Biology for engineering & medical aspirants.</p><div class="tags"><span class="tag">Physics</span><span class="tag">Chemistry</span><span class="tag">Maths</span><span class="tag">Bio</span></div></div>
+      <div class="cc"><div class="cc-icon"><i class="fas fa-palette"></i></div><h3>Arts Stream</h3><div class="level">Class XI — XII</div><p>Humanities covering History, Geography, Political Science and Economics.</p><div class="tags"><span class="tag">History</span><span class="tag">Geography</span><span class="tag">Pol. Sci.</span><span class="tag">Economics</span></div></div>
+      <div class="cc"><div class="cc-icon"><i class="fas fa-chart-line"></i></div><h3>Commerce Stream</h3><div class="level">Class XI — XII</div><p>Accountancy, Business Studies and Economics for future entrepreneurs.</p><div class="tags"><span class="tag">Accounts</span><span class="tag">Business</span><span class="tag">Economics</span><span class="tag">Maths</span></div></div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- PRINCIPAL MESSAGE -->
+
+<section class="msg-section" id="message">
+  <div class="container">
+
+    <!-- SECTION HEADING -->
+    <div style="text-align:center;margin-bottom:44px;">
+      <span class="section-label">Leadership</span>
+      <div class="divider" style="margin:0 auto 14px;"></div>
+      <h2 class="section-title">From The <span>Principal & Manager's</span> Desk</h2>
+    </div>
+
+    <!-- PRINCIPAL ROW -->
+    <div class="msg-grid" style="margin-bottom:52px;">
+      <div class="principal-card">
+        <div class="p-avatar">
+          {% if principal and principal.profile_image and principal.profile_image != 'default.png' %}
+            <img src="{{ principal.profile_image | imgurl("staff") }}"
+                 style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                 alt="{{ principal.name }}">
+            <i class="fas fa-user-tie" style="display:none;"></i>
+          {% else %}
+            <i class="fas fa-user-tie"></i>
+          {% endif %}
+        </div>
+        <h3>{% if principal %}{{ principal.name }}{% else %}Dr. Ramesh Kumar{% endif %}</h3>
+        <div class="ptitle">Principal</div>
+        <div class="pqual">{% if principal %}{{ principal.qualification }}{% else %}M.Ed., Ph.D. (Education){% endif %}</div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);">
+          <div style="color:rgba(255,255,255,.45);font-size:.7rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Experience</div>
+          <div style="color:var(--gold);font-weight:700;font-size:1.05rem;">20+ Years</div>
+        </div>
+      </div>
+      <div class="msg-text">
+        <span class="section-label">From The Principal's Desk</span>
+        <div class="divider"></div>
+        <h2 class="section-title">A Word From Our <span>Principal</span></h2>
+        <span class="quote">"</span>
+        <p>Honing a child is perhaps the biggest responsibility for all. It requires an environment that consistently nurtures the young mind, body and spirit — metamorphosing them into strong human beings capable of holding their own in the world outside.</p>
+        <p>At Sainik Public School, we believe that parents and teachers play the most important roles in the learning years of a child. The school encourages a close partnership between the trinity of learning — the child, the teacher, and the parent.</p>
+        <p>We are committed to guiding, shaping and building character. Learning here is not only about gaining knowledge, but about who our children will become.</p>
+        <div class="sig">— {% if principal %}{{ principal.name }}{% else %}Dr. Ramesh Kumar{% endif %}, Principal</div>
+      </div>
+    </div>
+
+    <!-- MANAGER ROW -->
+    <div class="msg-grid msg-grid-reverse">
+      <div class="msg-text">
+        <span class="section-label">From The Manager's Desk</span>
+        <div class="divider"></div>
+        <h2 class="section-title">A Word From Our <span>Manager</span></h2>
+        <span class="quote">"</span>
+        <p>Education is the most powerful weapon which you can use to change the world. At Sainik Public School, we have always strived to provide the best possible environment for our students to grow and flourish.</p>
+        <p>Our vision is to create an institution that not only imparts quality education but also instills values of integrity, discipline, and national pride in every student. We are proud of our dedicated faculty and staff who work tirelessly towards this goal.</p>
+        <p>Together, as a school family, we will continue to build a brighter future for every child who walks through our doors.</p>
+        <div class="sig">— {% if manager %}{{ manager.name }}{% else %}Sh. Rajendra Prasad{% endif %}, Manager</div>
+      </div>
+      <div class="principal-card">
+        <div class="p-avatar">
+          {% if manager and manager.profile_image and manager.profile_image != 'default.png' %}
+            <img src="{{ manager.profile_image | imgurl("staff") }}"
+                 style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                 alt="{{ manager.name }}">
+            <i class="fas fa-user-tie" style="display:none;"></i>
+          {% else %}
+            <i class="fas fa-user-tie"></i>
+          {% endif %}
+        </div>
+        <h3>{% if manager %}{{ manager.name }}{% else %}Sh. Rajendra Prasad{% endif %}</h3>
+        <div class="ptitle">Manager</div>
+        <div class="pqual">{% if manager %}{{ manager.qualification }}{% else %}M.A., B.Ed.{% endif %}</div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);">
+          <div style="color:rgba(255,255,255,.45);font-size:.7rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Experience</div>
+          <div style="color:var(--gold);font-weight:700;font-size:1.05rem;">15+ Years</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- <section class="msg-section" id="message">
+  <div class="container">
+    <div class="msg-grid">
+      <div class="principal-card">
+        <div class="p-avatar">
+          {% if principal and principal.profile_image and principal.profile_image != 'default.png' %}
+            <img src="{{ principal.profile_image | imgurl("staff") }}"
+                 style="width:100%;height:100%;object-fit:cover;border-radius:50%;"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                 alt="{{ principal.name }}">
+            <i class="fas fa-user-tie" style="display:none;"></i>
+          {% else %}
+            <i class="fas fa-user-tie"></i>
+          {% endif %}
+        </div>
+        <h3>{% if principal %}{{ principal.name }}{% else %}Dr. Ramesh Kumar{% endif %}</h3>
+        <div class="ptitle">Principal</div>
+        <div class="pqual">{% if principal %}{{ principal.qualification }}{% else %}M.Ed., Ph.D. (Education){% endif %}</div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1);">
+          <div style="color:rgba(255,255,255,.45);font-size:.7rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">Experience</div>
+          <div style="color:var(--gold);font-weight:700;font-size:1.05rem;">20+ Years</div>
+        </div>
+      </div>
+      <div class="msg-text">
+        <span class="section-label">From The Principal's Desk</span>
+        <div class="divider"></div>
+        <h2 class="section-title">A Word From Our <span>Principal</span></h2>
+        <span class="quote">"</span>
+        <p>Honing a child is perhaps the biggest responsibility for all. It requires an environment that consistently nurtures the young mind, body and spirit — metamorphosing them into strong human beings capable of holding their own in the world outside.</p>
+        <p>At Sainik Public School, we believe that parents and teachers play the most important roles in the learning years of a child. The school encourages a close partnership between the trinity of learning — the child, the teacher, and the parent.</p>
+        <p>We are committed to guiding, shaping and building character. Learning here is not only about gaining knowledge, but about who our children will become.</p>
+        <div class="sig">— Dr. Ramesh Kumar, Principal</div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+
+
+<!-- STAFF -->
+<section class="staff-section" id="staff">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:44px;">
+      <span class="section-label">Our Educators</span>
+      <div class="divider" style="margin:0 auto 14px;"></div>
+      <h2 class="section-title">Meet Our <span>Qualified Staff</span></h2>
+    </div>
+    <div class="staff-grid">
+      {% for s in staff %}
+      <div class="staff-card">
+        <div class="s-avatar">
+          <i class="fas fa-user-circle"></i>
+          <span class="s-initials">{{ s.name.split()[0][0] }}{{ s.name.split()[-1][0] }}</span>
+          {% if s.profile_image and s.profile_image != 'default.png' %}
+            <img src="{{ s.profile_image | imgurl("staff") }}"
+                 alt="{{ s.name }}"
+                 onerror="this.style.display='none';">
+          {% endif %}
+        </div>
+        <div class="s-info">
+          <h4>{{ s.name }}</h4>
+          <div class="srole">{{ s.designation }}</div>
+          <div class="ssubj">{{ s.subject }}</div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="gallery-section" id="gallery">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:44px;">
+      <span class="section-label">School Life</span>
+      <div class="divider" style="margin:0 auto 14px;"></div>
+      <h2 class="section-title">Photo <span>Gallery</span></h2>
+    </div>
+    <div class="gallery-grid">
+      {% for g in gallery %}
+      <div class="gi {% if loop.index == 1 %}tall{% elif loop.index == 3 %}wide{% endif %}">
+        {% if g.image %}
+          <img src="{{ g.image | imgurl("gallery") }}"
+               alt="{{ g.title }}"
+               onerror="this.parentElement.innerHTML='<div class=gi-no-photo><i class=fas fa-image></i></div><div class=gi-label>{{ g.title }}</div>'">
+        {% else %}
+          <div class="gi-no-photo"><i class="fas fa-image"></i></div>
+        {% endif %}
+        <div class="gi-overlay"><i class="fas fa-search-plus"></i></div>
+        <div class="gi-label">{{ g.title }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- PORTALS -->
+<section class="portal-section" id="portals">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:44px;">
+      <span class="section-label">Online Services</span>
+      <div class="divider" style="margin:0 auto 14px;"></div>
+      <h2 class="section-title">Student & Parent <span>Portals</span></h2>
+    </div>
+    <div class="portal-grid">
+      <a class="portal-card" href="/student/login">
+        <div class="portal-icon"><i class="fas fa-user-graduate"></i></div>
+        <h3>Student Portal</h3>
+        <p>Access class materials, attendance, timetable and all school resources online.</p>
+        <span class="portal-action">Login Now <i class="fas fa-arrow-right"></i></span>
+      </a>
+      <a class="portal-card" href="/result">
+        <div class="portal-icon"><i class="fas fa-poll-h"></i></div>
+        <h3>Check Result</h3>
+        <p>View your examination results, subject-wise marks and grade reports online.</p>
+        <span class="portal-action">Check Now <i class="fas fa-arrow-right"></i></span>
+      </a>
+      <a class="portal-card" href="/admin/login">
+        <div class="portal-icon"><i class="fas fa-lock"></i></div>
+        <h3>Admin Panel</h3>
+        <p>School administrators can manage notices, students, staff and results here.</p>
+        <span class="portal-action">Admin Login <i class="fas fa-arrow-right"></i></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:44px;">
+      <span class="section-label">Get In Touch</span>
+      <div class="divider" style="margin:0 auto 14px;background:linear-gradient(90deg,var(--gold),transparent);"></div>
+      <h2 class="section-title" style="color:#fff;">Contact <span style="color:var(--gold-light);">Us</span></h2>
+    </div>
+    <div class="contact-grid">
+      <div>
+        <div class="cic"><div class="cic-icon"><i class="fas fa-map-marker-alt"></i></div><div><h4>Address</h4><p>Sainik Public School, Bahadurganj, Uttar Pradesh, India</p></div></div>
+        <div class="cic"><div class="cic-icon"><i class="fas fa-phone-alt"></i></div><div><h4>Phone</h4><p>9119673130 &nbsp;|&nbsp; 7302118883</p></div></div>
+        <div class="cic"><div class="cic-icon"><i class="fas fa-envelope"></i></div><div><h4>Email</h4><p>sainikpublicschoolsps@gmail.com</p></div></div>
+        <div class="cic"><div class="cic-icon"><i class="fas fa-clock"></i></div><div><h4>School Hours</h4><p>Mon – Sat: 7:30 AM – 2:30 PM</p></div></div>
+        <div class="cic"><div class="cic-icon"><i class="fas fa-calendar-alt"></i></div><div><h4>Office Hours</h4><p>Mon – Sat: 9:00 AM – 4:00 PM</p></div></div>
+      </div>
+      <div>
+        <form class="contact-form" action="/contact" method="POST">
+          <h3>Send Us a Message</h3>
+          <div class="form-row">
+            <div class="fg"><label>Your Name</label><input name="name" type="text" placeholder="Full Name" required></div>
+            <div class="fg"><label>Phone</label><input name="phone" type="tel" placeholder="Mobile Number"></div>
+          </div>
+          <div class="fg"><label>Email</label><input name="email" type="email" placeholder="your@email.com"></div>
+          <div class="fg"><label>Subject</label>
+            <select name="subject">
+              <option>Admission Enquiry</option><option>Fee Related</option>
+              <option>Result / TC</option><option>General Query</option>
+            </select>
+          </div>
+          <div class="fg"><label>Message</label><textarea name="message" placeholder="Type your message..." required></textarea></div>
+          <button type="submit" class="btn-submit"><i class="fas fa-paper-plane" style="margin-right:7px"></i>Send Message</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ADMISSION FORM -->
+<section id="admission-form" style="background:var(--cream);padding:72px 0;">
+  <div class="container">
+    <div style="max-width:600px;margin:auto;text-align:center;margin-bottom:36px;">
+      <span class="section-label">Join Our School</span>
+      <div class="divider" style="margin:0 auto 14px;"></div>
+      <h2 class="section-title">Admission <span>Enquiry</span></h2>
+      <p style="color:var(--text-light);font-size:.9rem;">Admissions open for Session 2026-27. Fill the form and we will contact you.</p>
+    </div>
+    <form action="/admission" method="POST" style="max-width:600px;margin:auto;background:var(--white);border-radius:14px;padding:32px;box-shadow:var(--shadow);border-top:4px solid var(--gold);">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="fg" style="margin-bottom:0;"><label style="color:var(--text);">Student Name</label><input name="student_name" type="text" style="background:var(--gray);border:1px solid #dde2ef;color:var(--text);" placeholder="Full Name" required></div>
+        <div class="fg" style="margin-bottom:0;"><label style="color:var(--text);">Father's Name</label><input name="father_name" type="text" style="background:var(--gray);border:1px solid #dde2ef;color:var(--text);" placeholder="Father's Name"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;">
+        <div class="fg" style="margin-bottom:0;"><label style="color:var(--text);">Phone Number</label><input name="phone" type="tel" style="background:var(--gray);border:1px solid #dde2ef;color:var(--text);" placeholder="Contact Number" required></div>
+        <div class="fg" style="margin-bottom:0;"><label style="color:var(--text);">Seeking Admission For</label>
+          <select name="seeking_class" style="background:var(--gray);border:1px solid #dde2ef;color:var(--text);">
+            <option>Nursery</option><option>KG</option>
+            {% for i in range(1,13) %}<option>Class {{ i }}</option>{% endfor %}
+          </select>
+        </div>
+      </div>
+      <button type="submit" style="margin-top:20px;background:var(--navy);color:var(--white);border:none;padding:12px 32px;border-radius:50px;font-family:'Mulish',sans-serif;font-weight:700;font-size:.875rem;cursor:pointer;width:100%;transition:all .25s;">
+        <i class="fas fa-paper-plane" style="margin-right:7px"></i>Submit Admission Enquiry
+      </button>
+    </form>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Slider
+let cur=0;
+const slides=document.querySelectorAll('.slide');
+const dots=document.querySelectorAll('.dot');
+function goToSlide(n){slides[cur].classList.remove('active');dots[cur].classList.remove('active');cur=(n+slides.length)%slides.length;slides[cur].classList.add('active');dots[cur].classList.add('active');}
+function changeSlide(d){goToSlide(cur+d);}
+setInterval(()=>changeSlide(1),5000);
+
+// Counter
+const observer=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){
+    document.querySelectorAll('.stat-num').forEach(el=>{
+      const t=+el.dataset.target;let c=0;const step=t/55;
+      const tm=setInterval(()=>{c+=step;if(c>=t){el.textContent=t+'+';clearInterval(tm);}else el.textContent=Math.floor(c);},22);
+    });
+    observer.disconnect();
+  }});
+},{threshold:.3});
+const strip=document.querySelector('.stats-strip');
+if(strip) observer.observe(strip);
+</script>
+{% endblock %}

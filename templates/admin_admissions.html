@@ -1,0 +1,36 @@
+{% extends "admin_base.html" %}
+{% block title %}Admissions{% endblock %}
+{% block page_title %}Admission Enquiries{% endblock %}
+{% block admin_content %}
+<div class="table-card">
+  <div class="table-card-header">
+    <h3><i class="fas fa-file-alt" style="margin-right:7px"></i>All Admission Enquiries ({{ admissions|length }})</h3>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>#</th><th>Student Name</th><th>Father's Name</th><th>Phone</th><th>Class Sought</th><th>Date</th><th>Status</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for a in admissions %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ a.student_name }}</strong></td>
+        <td>{{ a.father_name or '–' }}</td>
+        <td>{{ a.phone }}</td>
+        <td><span class="badge badge-blue">{{ a.seeking_class }}</span></td>
+        <td style="font-size:.78rem;color:var(--text-light);">{{ a.received_at[:10] }}</td>
+        <td><span class="badge badge-{% if a.status=='approved' %}green{% elif a.status=='rejected' %}red{% else %}yellow{% endif %}">{{ a.status|title }}</span></td>
+        <td style="display:flex;gap:5px;flex-wrap:wrap;">
+          {% if a.status=='pending' %}
+          <a href="/admin/admissions/update/{{ a.id }}/approved" class="btn-view" style="border-color:#22c55e;color:#22c55e;" onclick="return confirm('Approve?')">✓ Approve</a>
+          <a href="/admin/admissions/update/{{ a.id }}/rejected" class="btn-del" onclick="return confirm('Reject?')">✗ Reject</a>
+          {% else %}
+          <a href="/admin/admissions/update/{{ a.id }}/pending" class="btn-view" onclick="return confirm('Reset to pending?')">Reset</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" style="text-align:center;color:var(--text-light);padding:30px;">No admission enquiries yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

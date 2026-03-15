@@ -1,0 +1,29 @@
+{% extends "admin_base.html" %}
+{% block title %}Messages{% endblock %}
+{% block page_title %}Contact Messages{% endblock %}
+{% block admin_content %}
+<div class="table-card">
+  <div class="table-card-header">
+    <h3><i class="fas fa-envelope" style="margin-right:7px"></i>All Contact Messages ({{ messages|length }})</h3>
+  </div>
+  <table class="data-table">
+    <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for m in messages %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td><strong>{{ m.name }}</strong></td>
+        <td>{{ m.phone or '–' }}</td>
+        <td style="font-size:.78rem;">{{ m.email or '–' }}</td>
+        <td><span class="badge badge-blue">{{ m.subject or '–' }}</span></td>
+        <td style="max-width:200px;font-size:.83rem;">{{ m.message[:80] }}{% if m.message|length > 80 %}...{% endif %}</td>
+        <td style="font-size:.78rem;color:var(--text-light);">{{ m.received_at[:10] }}</td>
+        <td><a href="/admin/messages/delete/{{ m.id }}" class="btn-del" onclick="return confirm('Delete?')"><i class="fas fa-trash"></i></a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" style="text-align:center;color:var(--text-light);padding:30px;">No messages yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

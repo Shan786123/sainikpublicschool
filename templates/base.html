@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Sainik Public School{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Mulish:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+  --navy:#0a1f44;--navy-mid:#112259;--navy-light:#1a3170;
+  --gold:#c9a84c;--gold-light:#e8c97a;--gold-dark:#a07830;
+  --cream:#fdf8f0;--white:#fff;--gray:#f4f6fa;
+  --text:#2d3748;--text-light:#718096;
+  --shadow:0 4px 24px rgba(10,31,68,.10);--shadow-lg:0 8px 40px rgba(10,31,68,.18);
+  --success:#22c55e;--error:#ef4444;--warning:#f59e0b;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Mulish',sans-serif;color:var(--text);background:var(--white);overflow-x:hidden;}
+
+/* TOPBAR */
+.topbar{background:var(--navy);color:#cdd9f0;font-size:.78rem;padding:7px 0;border-bottom:2px solid var(--gold);}
+.topbar .inner{max-width:1200px;margin:auto;padding:0 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;}
+.topbar a{color:var(--gold-light);text-decoration:none;margin-left:18px;transition:color .2s;}
+.topbar a:hover{color:#fff;}
+.topbar i{margin-right:5px;color:var(--gold);}
+
+/* HEADER */
+header{background:var(--white);box-shadow:var(--shadow);position:sticky;top:0;z-index:1000;}
+.header-inner{max-width:1200px;margin:auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:76px;}
+.logo{display:flex;align-items:center;gap:14px;text-decoration:none;}
+.logo-icon{width:54px;height:54px;background:var(--navy);border-radius:50%;display:flex;align-items:center;justify-content:center;border:3px solid var(--gold);}
+.logo-icon svg{width:30px;height:30px;fill:var(--gold);}
+.logo-text .name{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--navy);display:block;}
+.logo-text .tagline{font-size:.68rem;color:var(--gold-dark);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;}
+
+/* NAV */
+nav ul{list-style:none;display:flex;gap:2px;}
+nav ul li{position:relative;}
+nav ul li a{display:block;padding:9px 13px;font-size:.85rem;font-weight:600;color:var(--navy);text-decoration:none;border-radius:6px;transition:all .2s;}
+nav ul li a:hover,nav ul li a.active{background:var(--navy);color:var(--gold);}
+nav ul li .dropdown{display:none;position:absolute;top:100%;left:0;background:var(--white);border-top:3px solid var(--gold);box-shadow:var(--shadow-lg);border-radius:0 0 10px 10px;min-width:185px;z-index:999;}
+nav ul li:hover .dropdown{display:block;}
+nav ul li .dropdown a{border-radius:0;font-size:.82rem;border-bottom:1px solid #eef0f6;color:var(--text);padding:10px 16px;}
+nav ul li .dropdown a:hover{background:var(--cream);color:var(--navy);}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px;}
+.hamburger span{width:25px;height:2px;background:var(--navy);border-radius:2px;transition:all .3s;}
+
+/* FLASH MESSAGES */
+.flash-container{max-width:1200px;margin:16px auto;padding:0 24px;}
+.flash{padding:12px 18px;border-radius:8px;font-size:.88rem;font-weight:600;display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.flash.success{background:#dcfce7;color:#166534;border-left:4px solid var(--success);}
+.flash.error{background:#fee2e2;color:#991b1b;border-left:4px solid var(--error);}
+
+/* ADMISSION TICKER */
+.admission-band{background:linear-gradient(90deg,var(--gold-dark),var(--gold),var(--gold-dark));padding:12px 0;overflow:hidden;}
+.ticker-text{display:inline-block;animation:marquee 25s linear infinite;white-space:nowrap;font-weight:700;color:var(--navy);font-size:.88rem;}
+@keyframes marquee{from{transform:translateX(100vw);}to{transform:translateX(-100%);}}
+.ticker-text i{margin:0 14px;}
+
+/* FOOTER */
+footer{background:#070f24;padding:50px 0 0;border-top:3px solid var(--gold);}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;max-width:1200px;margin:auto;padding:0 24px 36px;}
+.footer-brand p{color:rgba(255,255,255,.5);font-size:.85rem;line-height:1.75;margin:14px 0 18px;}
+.social-links{display:flex;gap:10px;}
+.social-link{width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.5);font-size:.85rem;text-decoration:none;transition:all .25s;border:1px solid rgba(255,255,255,.08);}
+.social-link:hover{background:var(--gold);color:var(--navy);}
+.footer-col h4{font-family:'Playfair Display',serif;color:var(--gold);font-size:.95rem;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid rgba(201,168,76,.2);}
+.footer-links{list-style:none;}
+.footer-links li{margin-bottom:9px;}
+.footer-links a{color:rgba(255,255,255,.5);text-decoration:none;font-size:.83rem;transition:color .2s;display:flex;align-items:center;gap:7px;}
+.footer-links a i{color:var(--gold);font-size:.6rem;}
+.footer-links a:hover{color:var(--gold-light);}
+.footer-bottom{border-top:1px solid rgba(255,255,255,.06);padding:16px 24px;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.35);font-size:.78rem;flex-wrap:wrap;gap:8px;}
+.footer-bottom a{color:var(--gold);text-decoration:none;}
+
+/* SCROLL TOP */
+.scroll-top{position:fixed;bottom:26px;right:26px;z-index:888;width:42px;height:42px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:.95rem;cursor:pointer;box-shadow:0 4px 16px rgba(201,168,76,.4);opacity:0;transform:translateY(20px);transition:all .3s;border:none;text-decoration:none;}
+.scroll-top.show{opacity:1;transform:translateY(0);}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;inset:0;background:var(--navy);z-index:2000;flex-direction:column;padding:72px 28px 28px;overflow-y:auto;}
+.mobile-nav.open{display:flex;}
+.mobile-nav .close-btn{position:absolute;top:18px;right:18px;background:none;border:none;color:var(--gold);font-size:1.5rem;cursor:pointer;}
+.mobile-nav a{color:var(--white);text-decoration:none;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:.95rem;font-weight:600;}
+.mobile-nav a:hover{color:var(--gold);}
+.mobile-nav .sub{padding-left:16px;font-size:.85rem;opacity:.7;}
+
+/* UTILS */
+.container{max-width:1200px;margin:auto;padding:0 24px;}
+.section-label{font-size:.73rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold-dark);margin-bottom:8px;display:block;}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3vw,2.3rem);font-weight:700;color:var(--navy);margin-bottom:14px;line-height:1.2;}
+.section-title span{color:var(--gold-dark);}
+.divider{width:50px;height:3px;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:2px;margin-bottom:14px;}
+.btn-primary{background:var(--gold);color:var(--navy);padding:11px 26px;border-radius:50px;font-weight:700;font-size:.875rem;text-decoration:none;transition:all .25s;border:2px solid var(--gold);display:inline-block;}
+.btn-primary:hover{background:transparent;color:var(--gold);}
+.btn-outline{background:transparent;color:var(--navy);padding:11px 26px;border-radius:50px;font-weight:700;font-size:.875rem;text-decoration:none;transition:all .25s;border:2px solid var(--navy);display:inline-block;}
+.btn-outline:hover{background:var(--navy);color:var(--gold);}
+
+@media(max-width:768px){
+  nav{display:none;}.hamburger{display:flex;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:480px){.footer-grid{grid-template-columns:1fr;}}
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="inner">
+    <div><i class="fas fa-map-marker-alt"></i>Sainik Public School, Bahadurganj, Ghazipur (U.P)</div>
+    <div>
+      <a href="tel:9119673130"><i class="fas fa-phone"></i>9119673130</a>
+      <a href="tel:7302118883"><i class="fas fa-phone"></i>7302118883</a>
+      <a href="mailto:sainikpublicschoolsps@gmail.com"><i class="fas fa-envelope"></i>sainikpublicschoolsps@gmail.com</a>
+      <a href="/admin/login"><i class="fas fa-lock"></i>Admin</a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="/" class="logo">
+      <div class="logo-icon"><svg viewBox="0 0 40 40"><path d="M20 4L4 14v4h4v14h4V20h8v12h4V18h4v-4L20 4z"/><circle cx="20" cy="10" r="3"/></svg></div>
+      <div class="logo-text"><span class="name">Sainik Public School</span><span class="tagline">Excellence · Discipline · Integrity</span></div>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="/" {% if request.path=='/' %}class="active"{% endif %}>Home</a></li>
+        <li><a href="/#about">About ▾</a>
+          <div class="dropdown">
+            <a href="/#about">About Us</a>
+            <a href="/#message">Principal's Message</a>
+            <a href="/#message">Manager's Message</a>
+          </div>
+        </li>
+        <li><a href="/#courses">Courses</a></li>
+        <li><a href="/#gallery">Gallery</a></li>
+        <li><a href="/result">Results</a></li>
+        <li><a href="/student/login" {% if '/student' in request.path %}class="active"{% endif %}>Student Portal</a></li>
+        <li><a href="/#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="hamburger" onclick="document.getElementById('mobileNav').classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</header>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <button class="close-btn" onclick="document.getElementById('mobileNav').classList.remove('open')"><i class="fas fa-times"></i></button>
+  <a href="/">Home</a>
+  <a href="/#about">About Us</a>
+  <a href="/#courses">Courses</a>
+  <a href="/#gallery">Gallery</a>
+  <a href="/result">Check Result</a>
+  <a href="/student/login">Student Portal</a>
+  <a href="/#contact">Contact Us</a>
+  <a href="/admin/login" class="sub">Admin Login</a>
+</div>
+
+<!-- FLASH -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-container">
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}"><i class="fas fa-{% if cat=='success' %}check-circle{% else %}exclamation-circle{% endif %}"></i>{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% block content %}{% endblock %}
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" class="logo" style="margin-bottom:14px;display:inline-flex;">
+        <div class="logo-icon"><svg viewBox="0 0 40 40"><path d="M20 4L4 14v4h4v14h4V20h8v12h4V18h4v-4L20 4z"/><circle cx="20" cy="10" r="3"/></svg></div>
+        <div class="logo-text"><span class="name" style="color:#fff;">Sainik Public School</span><span class="tagline">Bahadurganj, Ghazipur (U.P)</span><br><span class="tagline">Excellence · Discipline · Integrity</span></div>
+      </a>
+      <p>Quality education from Nursery to Class XII. Building disciplined, knowledgeable and patriotic citizens since establishment.</p>
+      <div class="social-links">
+        <a class="social-link" href="https://www.facebook.com/share/1D1cthCTKj/"><i class="fab fa-facebook-f"></i></a>
+        <a class="social-link" href="#"><i class="fab fa-youtube"></i></a>
+        <a class="social-link" href="#"><i class="fab fa-whatsapp"></i></a>
+        <a class="social-link" href="#"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
+    <div class="footer-col"><h4>Quick Links</h4>
+      <ul class="footer-links">
+        <li><a href="/"><i class="fas fa-chevron-right"></i>Home</a></li>
+        <li><a href="/#about"><i class="fas fa-chevron-right"></i>About Us</a></li>
+        <li><a href="/#courses"><i class="fas fa-chevron-right"></i>Courses</a></li>
+        <li><a href="/#staff"><i class="fas fa-chevron-right"></i>Staff List</a></li>
+        <li><a href="/#gallery"><i class="fas fa-chevron-right"></i>Gallery</a></li>
+      </ul>
+    </div>
+    <div class="footer-col"><h4>Portals</h4>
+      <ul class="footer-links">
+        <li><a href="/student/login"><i class="fas fa-chevron-right"></i>Student Login</a></li>
+        <li><a href="/result"><i class="fas fa-chevron-right"></i>Check Result</a></li>
+        <li><a href="/admin/login"><i class="fas fa-chevron-right"></i>Admin Panel</a></li>
+        <li><a href="/#contact"><i class="fas fa-chevron-right"></i>Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-col"><h4>Contact</h4>
+      <ul class="footer-links">
+        <li><a href="#"><i class="fas fa-map-marker-alt"></i>Bahadurganj, U.P.</a></li>
+        <li><a href="tel:9119673130"><i class="fas fa-phone"></i>9119673130</a></li>
+        <li><a href="tel:7302118883"><i class="fas fa-phone"></i>7302118883</a></li>
+        <li><a href="mailto:sainikpublicschoolsps@gmail.com"><i class="fas fa-envelope"></i>sainikpublicschoolsps@gmail.com</a></li>
+        <li><a href="#"><i class="fas fa-clock"></i>Mon–Sat 7:30AM–2:30PM</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Sainik Public School. All Rights Reserved.</span>
+    <span>Design & Built by <a href="https://www.linkedin.com/in/khalid-ziya-khan?utm_source=share_via&utm_content=profile&utm_medium=member_android">Khalid Ziya Khan</a> | <a href="/admin/login">Admin Panel</a></span>
+  </div>
+</footer>
+
+<a class="scroll-top" id="scrollTop" href="#"><i class="fas fa-chevron-up"></i></a>
+<script>
+window.addEventListener('scroll',()=>{
+  document.getElementById('scrollTop').classList.toggle('show',window.scrollY>400);
+});
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

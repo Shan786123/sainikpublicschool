@@ -1,0 +1,268 @@
+{% extends "admin_base.html" %}
+{% block title %}Students{% endblock %}
+{% block page_title %}Student Management{% endblock %}
+
+{% block extra_css %}
+<style>
+.student-avatar-sm{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid var(--gold);background:#eee;}
+.action-btns{display:flex;gap:5px;flex-wrap:wrap;}
+</style>
+{% endblock %}
+
+{% block admin_content %}
+<div class="table-card">
+  <div class="table-card-header">
+    <h3><i class="fas fa-user-graduate" style="margin-right:7px"></i>All Students ({{ students|length }})</h3>
+    <button class="add-btn" onclick="openModal('addStudent')"><i class="fas fa-plus"></i>Add Student</button>
+  </div>
+  <div style="overflow-x:auto;">
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Photo</th><th>Roll No</th><th>Name</th><th>Class</th>
+        <th>Father</th><th>Phone</th><th>Status</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in students %}
+      <tr>
+        <td>
+          {% if s.profile_image and s.profile_image != 'default.png' %}
+            <img src="{{ s.profile_image | imgurl("students") }}" class="student-avatar-sm"
+                 onerror="this.src='/static/images/default_student.svg'">
+          {% else %}
+            <img src="/static/images/default_student.svg" class="student-avatar-sm">
+          {% endif %}
+        </td>
+        <td><strong>{{ s.roll_no }}</strong></td>
+        <td>
+          <strong>{{ s.name }}</strong>
+          {% if s.enrollment_no %}<br><small style="color:var(--text-light);">{{ s.enrollment_no }}</small>{% endif %}
+        </td>
+        <td><span class="badge badge-blue">{{ s.class_name }} – {{ s.section }}</span></td>
+        <td>{{ s.father_name or "–" }}</td>
+        <td>{{ s.phone or "–" }}</td>
+        <td><span class="badge badge-{% if s.status=='active' %}green{% else %}red{% endif %}">{{ s.status|title }}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-view"
+              onclick="openEditStudent(
+                {{ s.id }},
+                '{{ s.roll_no }}',
+                '{{ s.enrollment_no or "" }}',
+                '{{ s.name }}',
+                '{{ s.father_name or "" }}',
+                '{{ s.mother_name or "" }}',
+                '{{ s.gender or "Male" }}',
+                '{{ s.course or "General" }}',
+                '{{ s.class_name }}',
+                '{{ s.section or "A" }}',
+                '{{ s.dob or "" }}',
+                '{{ s.phone or "" }}',
+                '{{ s.email or "" }}',
+                '{{ s.address or "" }}',
+                '{{ s.status }}',
+                '{{ s.profile_image or "default.png" }}'
+              )">
+              <i class="fas fa-edit"></i> Edit
+            </button>
+            <a href="/admin/students/delete/{{ s.id }}"
+               class="btn-del"
+               onclick="return confirm('Remove {{ s.name }}?')">
+              <i class="fas fa-trash"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="8" style="text-align:center;color:var(--text-light);padding:30px;">No students found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<!-- ─── ADD STUDENT MODAL ─── -->
+<div class="modal-overlay" id="addStudent">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('addStudent')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-user-graduate" style="color:var(--gold);margin-right:8px"></i>Add New Student</h3>
+    <form action="/admin/students/add" method="POST" enctype="multipart/form-data">
+      <!-- PHOTO UPLOAD -->
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="width:90px;height:90px;border-radius:50%;border:3px dashed var(--gold);margin:0 auto 10px;overflow:hidden;background:#f8f8f8;display:flex;align-items:center;justify-content:center;">
+          <img id="add_preview" src="/static/images/default_student.svg" style="width:100%;height:100%;object-fit:cover;">
+        </div>
+        <input type="file" id="add_photo" name="photo" accept="image/*"
+               onchange="previewPhoto('add_photo','add_preview')" style="display:none;">
+        <label for="add_photo" style="display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:var(--gold);padding:7px 16px;border-radius:50px;cursor:pointer;font-size:.78rem;font-weight:700;">
+          <i class="fas fa-camera"></i>Upload Photo
+        </label>
+        <div style="font-size:.72rem;color:var(--text-light);margin-top:5px;">JPG / PNG / WEBP · max 5 MB</div>
+      </div>
+
+      <div class="form-row2">
+        <div class="fg"><label>Roll Number *</label><input name="roll_no" type="text" placeholder="e.g. STU010" required></div>
+        <div class="fg"><label>Enrollment No</label><input name="enrollment_no" type="text" placeholder="e.g. ENR2024010"></div>
+      </div>
+      <div class="fg"><label>Full Name *</label><input name="name" type="text" placeholder="Student Full Name" required></div>
+      <div class="form-row2">
+        <div class="fg"><label>Father's Name</label><input name="father_name" type="text"></div>
+        <div class="fg"><label>Mother's Name</label><input name="mother_name" type="text"></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Gender</label>
+          <select name="gender"><option>Male</option><option>Female</option><option>Other</option></select>
+        </div>
+        <div class="fg"><label>Course / Stream</label>
+          <select name="course"><option>General</option><option>Science</option><option>Commerce</option><option>Arts</option></select>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Class *</label>
+          <select name="class_name">
+            <option>Nursery</option><option>KG</option>
+            {% for i in range(1,13) %}<option>Class {{ i }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="fg"><label>Section</label>
+          <select name="section"><option>A</option><option>B</option><option>C</option></select>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Date of Birth</label><input name="dob" type="date"></div>
+        <div class="fg"><label>Phone</label><input name="phone" type="tel"></div>
+      </div>
+      <div class="fg"><label>Email</label><input name="email" type="email"></div>
+      <div class="fg"><label>Address</label><input name="address" type="text"></div>
+      <div class="fg"><label>Login Password</label><input name="password" type="text" value="password123"></div>
+      <button type="submit" class="submit-btn"><i class="fas fa-save" style="margin-right:7px"></i>Add Student</button>
+    </form>
+  </div>
+</div>
+
+<!-- ─── EDIT STUDENT MODAL ─── -->
+<div class="modal-overlay" id="editStudent">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('editStudent')"><i class="fas fa-times"></i></button>
+    <h3><i class="fas fa-user-edit" style="color:var(--gold);margin-right:8px"></i>Edit Student Details</h3>
+    <form id="editStudentForm" action="" method="POST" enctype="multipart/form-data">
+
+      <!-- CURRENT PHOTO + CHANGE -->
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="width:90px;height:90px;border-radius:50%;border:3px solid var(--gold);margin:0 auto 10px;overflow:hidden;background:#eee;">
+          <img id="edit_preview" src="" style="width:100%;height:100%;object-fit:cover;"
+               onerror="this.src='/static/images/default_student.svg'">
+        </div>
+        <input type="file" id="edit_photo" name="photo" accept="image/*"
+               onchange="previewPhoto('edit_photo','edit_preview')" style="display:none;">
+        <label for="edit_photo" style="display:inline-flex;align-items:center;gap:7px;background:var(--navy);color:var(--gold);padding:7px 16px;border-radius:50px;cursor:pointer;font-size:.78rem;font-weight:700;">
+          <i class="fas fa-camera"></i>Change Photo
+        </label>
+        <div style="font-size:.72rem;color:var(--text-light);margin-top:5px;">Leave unchanged to keep current photo</div>
+      </div>
+
+      <div class="form-row2">
+        <div class="fg">
+          <label>Roll Number</label>
+          <input id="edit_roll_no" type="text" style="background:#f0f0f0;opacity:.7;" readonly>
+        </div>
+        <div class="fg"><label>Enrollment No</label><input name="enrollment_no" id="edit_enrollment_no" type="text"></div>
+      </div>
+      <div class="fg"><label>Full Name *</label><input name="name" id="edit_name" type="text" required></div>
+      <div class="form-row2">
+        <div class="fg"><label>Father's Name</label><input name="father_name" id="edit_father_name" type="text"></div>
+        <div class="fg"><label>Mother's Name</label><input name="mother_name" id="edit_mother_name" type="text"></div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Gender</label>
+          <select name="gender" id="edit_gender"><option>Male</option><option>Female</option><option>Other</option></select>
+        </div>
+        <div class="fg"><label>Course</label>
+          <select name="course" id="edit_course"><option>General</option><option>Science</option><option>Commerce</option><option>Arts</option></select>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Class *</label>
+          <select name="class_name" id="edit_class_name">
+            <option>Nursery</option><option>KG</option>
+            {% for i in range(1,13) %}<option>Class {{ i }}</option>{% endfor %}
+          </select>
+        </div>
+        <div class="fg"><label>Section</label>
+          <select name="section" id="edit_section"><option>A</option><option>B</option><option>C</option></select>
+        </div>
+      </div>
+      <div class="form-row2">
+        <div class="fg"><label>Date of Birth</label><input name="dob" id="edit_dob" type="date"></div>
+        <div class="fg"><label>Phone</label><input name="phone" id="edit_phone" type="tel"></div>
+      </div>
+      <div class="fg"><label>Email</label><input name="email" id="edit_email" type="email"></div>
+      <div class="fg"><label>Address</label><input name="address" id="edit_address" type="text"></div>
+      <div class="form-row2">
+        <div class="fg"><label>Status</label>
+          <select name="status" id="edit_status"><option value="active">Active</option><option value="inactive">Inactive</option></select>
+        </div>
+        <div class="fg">
+          <label>New Password <small style="color:var(--text-light);font-weight:400;">(blank = keep current)</small></label>
+          <input name="password" type="text" placeholder="Leave blank to keep">
+        </div>
+      </div>
+      <button type="submit" class="submit-btn" style="background:var(--gold);color:var(--navy);">
+        <i class="fas fa-save" style="margin-right:7px"></i>Save Changes
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function previewPhoto(inputId, previewId) {
+  const input = document.getElementById(inputId);
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById(previewId);
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function openEditStudent(id, roll_no, enrollment_no, name, father_name, mother_name,
+                         gender, course, class_name, section, dob, phone, email, address, status, photo) {
+  document.getElementById('editStudentForm').action = '/admin/students/edit/' + id;
+  document.getElementById('edit_roll_no').value       = roll_no;
+  document.getElementById('edit_enrollment_no').value = enrollment_no;
+  document.getElementById('edit_name').value          = name;
+  document.getElementById('edit_father_name').value   = father_name;
+  document.getElementById('edit_mother_name').value   = mother_name;
+  document.getElementById('edit_dob').value           = dob;
+  document.getElementById('edit_phone').value         = phone;
+  document.getElementById('edit_email').value         = email;
+  document.getElementById('edit_address').value       = address;
+  // Set current photo
+  const preview = document.getElementById('edit_preview');
+  if (photo && photo !== 'default.png') {
+    preview.src = photo.startsWith('http') ? photo : '/static/uploads/students/' + photo;
+  } else {
+    preview.src = '/static/images/default_student.svg';
+  }
+  setSelectValue('edit_gender',     gender);
+  setSelectValue('edit_course',     course);
+  setSelectValue('edit_class_name', class_name);
+  setSelectValue('edit_section',    section);
+  setSelectValue('edit_status',     status);
+  openModal('editStudent');
+}
+function setSelectValue(id, val) {
+  const sel = document.getElementById(id);
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === val || sel.options[i].text === val) {
+      sel.selectedIndex = i; break;
+    }
+  }
+}
+</script>
+{% endblock %}
